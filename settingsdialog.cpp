@@ -227,6 +227,6 @@ void SettingsDialog::loadSettings()
     ui->dataBitsBox->setCurrentText(settings.value("DataBits").toString());
     ui->parityBox->setCurrentText(settings.value("Parity").toString());
     ui->stopBitsBox->setCurrentText(settings.value("StopBits").toString());
-    ui->flowControlBox->setCurrentText(settings.value("FlowControl").toString());    
+    ui->flowControlBox->setCurrentText(settings.value("FlowControl").toString());
 
 }

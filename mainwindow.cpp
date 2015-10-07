@@ -28,9 +28,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
+#include "led.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -39,12 +41,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     serial = new QSerialPort(this);
-    settings = new SettingsDialog;
+    settings = new SettingsDialog;    
 
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionQuit->setEnabled(true);
-    ui->actionConfigure->setEnabled(true);
+    ui->actionConfigure->setEnabled(true);    
 
     initActionsConnections();
 
@@ -65,14 +67,21 @@ void MainWindow::openSerialPort()
     SettingsDialog::Settings p = settings->settings();
     serial->setPortName(p.name);
     serial->setBaudRate(p.baudRate);
-    serial->setDataBits(p.dataBits);
+    serial->setDataBits(p.dataBits);    
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
+    ui->SerialPort->setText(p.name);
+    ui->BaudRate->setText(p.stringBaudRate);
+    ui->DataBits->setText(p.stringDataBits);
+    ui->Parity->setText(p.stringParity);
+    ui->StopBits->setText(p.stringStopBits);
+    ui->FlowControl->setText(p.stringFlowControl);
     if (serial->open(QIODevice::ReadWrite)) {
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
-            ui->actionConfigure->setEnabled(false);
+            ui->actionConfigure->setEnabled(false);            
+            ui->led->setColor("green");
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
@@ -80,7 +89,15 @@ void MainWindow::openSerialPort()
         QMessageBox::critical(this, tr("Error"), serial->errorString());
 
         ui->statusBar->showMessage(tr("Open error"));
+        ui->led->setColor("red");
     }
+    qDebug()<<"setPortName"<<p.name;
+    qDebug()<<"setBaudRate"<<p.baudRate;
+    qDebug()<<"setDataBits"<<p.dataBits;
+    qDebug()<<"setParity"<<p.parity;
+    qDebug()<<"setStopBits"<<p.stopBits;
+    qDebug()<<"setFlowControl"<<p.flowControl;
+
 }
 
 void MainWindow::closeSerialPort()
@@ -91,6 +108,7 @@ void MainWindow::closeSerialPort()
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
     ui->statusBar->showMessage(tr("Disconnected"));
+    ui->led->setColor("red");
 }
 
 void MainWindow::about()

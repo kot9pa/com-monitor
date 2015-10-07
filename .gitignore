@@ -3,3 +3,4 @@
 *.Release
 Makefile
 debug
+release

@@ -13,14 +13,18 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "LED.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -36,6 +40,22 @@ public:
     QAction *actionStatusBar;
     QWidget *centralWidget;
     QVBoxLayout *verticalLayout;
+    QGridLayout *gridLayout;
+    LED *led;
+    QLabel *StopBits;
+    QLabel *BaudRate;
+    QLabel *DataBits;
+    QLabel *Parity;
+    QLabel *Status;
+    QSpacerItem *horizontalSpacer;
+    QLabel *FlowControl;
+    QLabel *SerialPort;
+    QLabel *label_1;
+    QLabel *label_2;
+    QLabel *label_3;
+    QLabel *label_4;
+    QLabel *label_5;
+    QLabel *label_6;
     QMenuBar *menuBar;
     QMenu *menuCalls;
     QMenu *menuTools;
@@ -48,9 +68,15 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(400, 300);
+        MainWindow->resize(314, 311);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
+        MainWindow->setSizePolicy(sizePolicy);
         MainWindow->setCursor(QCursor(Qt::ArrowCursor));
         MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
+        MainWindow->setLayoutDirection(Qt::LeftToRight);
         actionAbout = new QAction(MainWindow);
         actionAbout->setObjectName(QStringLiteral("actionAbout"));
         actionConnect = new QAction(MainWindow);
@@ -83,14 +109,108 @@ public:
         actionStatusBar->setChecked(true);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        centralWidget->setEnabled(true);
+        centralWidget->setLayoutDirection(Qt::LeftToRight);
         verticalLayout = new QVBoxLayout(centralWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(11, 11, 11, 7);
+        gridLayout = new QGridLayout();
+        gridLayout->setSpacing(6);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+        led = new LED(centralWidget);
+        led->setObjectName(QStringLiteral("led"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(led->sizePolicy().hasHeightForWidth());
+        led->setSizePolicy(sizePolicy1);
+        led->setLayoutDirection(Qt::LeftToRight);
+
+        gridLayout->addWidget(led, 7, 2, 1, 1);
+
+        StopBits = new QLabel(centralWidget);
+        StopBits->setObjectName(QStringLiteral("StopBits"));
+
+        gridLayout->addWidget(StopBits, 4, 1, 1, 1);
+
+        BaudRate = new QLabel(centralWidget);
+        BaudRate->setObjectName(QStringLiteral("BaudRate"));
+
+        gridLayout->addWidget(BaudRate, 1, 1, 1, 1);
+
+        DataBits = new QLabel(centralWidget);
+        DataBits->setObjectName(QStringLiteral("DataBits"));
+        DataBits->setLayoutDirection(Qt::LeftToRight);
+        DataBits->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout->addWidget(DataBits, 2, 1, 1, 1);
+
+        Parity = new QLabel(centralWidget);
+        Parity->setObjectName(QStringLiteral("Parity"));
+
+        gridLayout->addWidget(Parity, 3, 1, 1, 1);
+
+        Status = new QLabel(centralWidget);
+        Status->setObjectName(QStringLiteral("Status"));
+        Status->setAlignment(Qt::AlignCenter);
+
+        gridLayout->addWidget(Status, 7, 1, 1, 1);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer, 7, 0, 1, 1);
+
+        FlowControl = new QLabel(centralWidget);
+        FlowControl->setObjectName(QStringLiteral("FlowControl"));
+        FlowControl->setAlignment(Qt::AlignCenter);
+
+        gridLayout->addWidget(FlowControl, 5, 1, 1, 1);
+
+        SerialPort = new QLabel(centralWidget);
+        SerialPort->setObjectName(QStringLiteral("SerialPort"));
+
+        gridLayout->addWidget(SerialPort, 0, 1, 1, 1);
+
+        label_1 = new QLabel(centralWidget);
+        label_1->setObjectName(QStringLiteral("label_1"));
+
+        gridLayout->addWidget(label_1, 0, 0, 1, 1);
+
+        label_2 = new QLabel(centralWidget);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        gridLayout->addWidget(label_2, 1, 0, 1, 1);
+
+        label_3 = new QLabel(centralWidget);
+        label_3->setObjectName(QStringLiteral("label_3"));
+
+        gridLayout->addWidget(label_3, 2, 0, 1, 1);
+
+        label_4 = new QLabel(centralWidget);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        gridLayout->addWidget(label_4, 3, 0, 1, 1);
+
+        label_5 = new QLabel(centralWidget);
+        label_5->setObjectName(QStringLiteral("label_5"));
+
+        gridLayout->addWidget(label_5, 4, 0, 1, 1);
+
+        label_6 = new QLabel(centralWidget);
+        label_6->setObjectName(QStringLiteral("label_6"));
+
+        gridLayout->addWidget(label_6, 5, 0, 1, 1);
+
+
+        verticalLayout->addLayout(gridLayout);
+
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 26));
+        menuBar->setGeometry(QRect(0, 0, 314, 26));
         menuCalls = new QMenu(menuBar);
         menuCalls->setObjectName(QStringLiteral("menuCalls"));
         menuTools = new QMenu(menuBar);
@@ -159,6 +279,19 @@ public:
         actionQuit->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0));
         actionToolBar->setText(QApplication::translate("MainWindow", "ToolBar", 0));
         actionStatusBar->setText(QApplication::translate("MainWindow", "StatusBar", 0));
+        StopBits->setText(QString());
+        BaudRate->setText(QString());
+        DataBits->setText(QString());
+        Parity->setText(QString());
+        Status->setText(QApplication::translate("MainWindow", "Status", 0));
+        FlowControl->setText(QString());
+        SerialPort->setText(QString());
+        label_1->setText(QApplication::translate("MainWindow", "Serial Port:", 0));
+        label_2->setText(QApplication::translate("MainWindow", "Baud Rate:", 0));
+        label_3->setText(QApplication::translate("MainWindow", "Data Bits:", 0));
+        label_4->setText(QApplication::translate("MainWindow", "Parity:", 0));
+        label_5->setText(QApplication::translate("MainWindow", "Stop Bits:", 0));
+        label_6->setText(QApplication::translate("MainWindow", "Flow Control:", 0));
         menuCalls->setTitle(QApplication::translate("MainWindow", "Calls", 0));
         menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0));
