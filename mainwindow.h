@@ -40,6 +40,7 @@ class MainWindow;
 
 QT_END_NAMESPACE
 
+class Console;
 class SettingsDialog;
 
 class MainWindow : public QMainWindow
@@ -50,22 +51,23 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
+private slots:    
     void openSerialPort();
     void closeSerialPort();
     void about();
     void writeData(const QByteArray &data);
-    void readData();
-
-    void handleError(QSerialPort::SerialPortError error);
+    void readData();    
+    void handleError(QSerialPort::SerialPortError error);    
 
 private:
     void initActionsConnections();
+    void initSerialPort();
 
 private:
     Ui::MainWindow *ui;
     SettingsDialog *settings;
     QSerialPort *serial;
+    Console *console;
 
 };
 

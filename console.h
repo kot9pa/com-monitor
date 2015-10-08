@@ -32,68 +32,33 @@
 **
 ****************************************************************************/
 
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
-#include <QDialog>
-#include <QtSerialPort/QSerialPort>
+#include <QPlainTextEdit>
 
-QT_USE_NAMESPACE
-
-QT_BEGIN_NAMESPACE
-
-namespace Ui {
-class SettingsDialog;
-}
-
-class QIntValidator;
-
-QT_END_NAMESPACE
-
-class SettingsDialog : public QDialog
+class Console : public QPlainTextEdit
 {
     Q_OBJECT
 
+signals:
+    void getData(const QByteArray &data);
+
 public:
-    struct Settings {
-        QString name;
-        qint32 baudRate;
-        QString stringBaudRate;
-        QSerialPort::DataBits dataBits;
-        QString stringDataBits;
-        QSerialPort::Parity parity;
-        QString stringParity;
-        QSerialPort::StopBits stopBits;
-        QString stringStopBits;
-        QSerialPort::FlowControl flowControl;
-        QString stringFlowControl;
+    explicit Console(QWidget *parent = 0);
 
-    };
+    void putData(const QByteArray &data);
+//    void setLocalEchoEnabled(bool set);
 
-    explicit SettingsDialog(QWidget *parent = 0);
-    ~SettingsDialog();
+protected:
+    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void mousePressEvent(QMouseEvent *e);
+    virtual void mouseDoubleClickEvent(QMouseEvent *e);
+    virtual void contextMenuEvent(QContextMenuEvent *e);
 
-    Settings settings() const;
-
-private slots:
-    void showPortInfo(int idx);
-    void apply();
-    void checkCustomBaudRatePolicy(int idx);
-    void checkCustomDevicePathPolicy(int idx);
-    void saveSettings();
-    void fillPortsInfo();
-
-private:
-    void fillPortsParameters();    
-    void loadSettings();
-    void updateSettings();
-
-private:
-    Ui::SettingsDialog *ui;
-    Settings currentSettings;
-    QIntValidator *intValidator;
-    QString settingsFile;
+//private:
+//    bool localEchoEnabled;
 
 };
 
-#endif // SETTINGSDIALOG_H
+#endif // CONSOLE_H

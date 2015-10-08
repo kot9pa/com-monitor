@@ -48,6 +48,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     ui->baudRateBox->setInsertPolicy(QComboBox::NoInsert);
 
+    connect(ui->searchButton, SIGNAL(clicked()),
+            this, SLOT(fillPortsInfo()));
     connect(ui->applyButton, SIGNAL(clicked()),
             this, SLOT(apply()));
     connect(ui->saveButton, SIGNAL(clicked()),
@@ -222,7 +224,8 @@ void SettingsDialog::loadSettings()
 {
  QSettings settings(settingsFile, QSettings::IniFormat);
 
-    ui->serialPortInfoListBox->setCurrentText(settings.value("SerialPort").toString());
+    ui->serialPortInfoListBox->
+            setCurrentText(settings.value("SerialPort").toString());
     ui->baudRateBox->setCurrentText(settings.value("BaudRate").toString());
     ui->dataBitsBox->setCurrentText(settings.value("DataBits").toString());
     ui->parityBox->setCurrentText(settings.value("Parity").toString());

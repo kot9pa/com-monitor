@@ -14,11 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    console.cpp
 
 HEADERS  += mainwindow.h \
     settingsdialog.h \
-    led.h
+    led.h \
+    console.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui
@@ -32,3 +34,5 @@ else:unix: LIBS += -L$$PWD/../../qt/5.5/Src/led-designer-plugin/ -lled-designer-
 
 INCLUDEPATH += $$PWD/../../qt/5.5/Src/led-designer-plugin/release
 DEPENDPATH += $$PWD/../../qt/5.5/Src/led-designer-plugin/release
+
+DISTFILES +=

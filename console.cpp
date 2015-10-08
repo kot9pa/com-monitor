@@ -1,9 +1,5 @@
 /****************************************************************************
 **
-** Copyright (C) 2012 Denis Shienkov <denis.shienkov@gmail.com>
-** Copyright (C) 2012 Laszlo Papp <lpapp@kde.org>
-** Contact: http://www.qt.io/licensing/
-**
 ** This file is part of the QtSerialPort module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL21$
@@ -32,68 +28,65 @@
 **
 ****************************************************************************/
 
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
+#include "console.h"
 
-#include <QDialog>
-#include <QtSerialPort/QSerialPort>
+#include <QScrollBar>
+#include <QDebug>
 
-QT_USE_NAMESPACE
+Console::Console(QWidget *parent)
+    : QPlainTextEdit(parent)
+//    , localEchoEnabled(false)
+{
+    document()->setMaximumBlockCount(100);
+/*    QPalette p = palette();
+    p.setColor(QPalette::Base, Qt::black);
+    p.setColor(QPalette::Text, Qt::green);
+    setPalette(p);*/
 
-QT_BEGIN_NAMESPACE
-
-namespace Ui {
-class SettingsDialog;
 }
 
-class QIntValidator;
-
-QT_END_NAMESPACE
-
-class SettingsDialog : public QDialog
+void Console::putData(const QByteArray &data)
 {
-    Q_OBJECT
+    insertPlainText(QString(data));
 
-public:
-    struct Settings {
-        QString name;
-        qint32 baudRate;
-        QString stringBaudRate;
-        QSerialPort::DataBits dataBits;
-        QString stringDataBits;
-        QSerialPort::Parity parity;
-        QString stringParity;
-        QSerialPort::StopBits stopBits;
-        QString stringStopBits;
-        QSerialPort::FlowControl flowControl;
-        QString stringFlowControl;
+    QScrollBar *bar = verticalScrollBar();
+    bar->setValue(bar->maximum());
+}
 
-    };
+/*
+void Console::setLocalEchoEnabled(bool set)
+{
+    localEchoEnabled = set;
+}*/
 
-    explicit SettingsDialog(QWidget *parent = 0);
-    ~SettingsDialog();
+void Console::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key()) {
+    case Qt::Key_Backspace:
+    case Qt::Key_Left:
+    case Qt::Key_Right:
+    case Qt::Key_Up:
+    case Qt::Key_Down:
+        break;
+    default:
+//        if (localEchoEnabled)
+          QPlainTextEdit::keyPressEvent(e);
+          emit getData(e->text().toLocal8Bit());
+    }
+}
 
-    Settings settings() const;
+void Console::mousePressEvent(QMouseEvent *e)
+{
+    Q_UNUSED(e)
+    setFocus();
+}
 
-private slots:
-    void showPortInfo(int idx);
-    void apply();
-    void checkCustomBaudRatePolicy(int idx);
-    void checkCustomDevicePathPolicy(int idx);
-    void saveSettings();
-    void fillPortsInfo();
+void Console::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    Q_UNUSED(e)
+}
 
-private:
-    void fillPortsParameters();    
-    void loadSettings();
-    void updateSettings();
-
-private:
-    Ui::SettingsDialog *ui;
-    Settings currentSettings;
-    QIntValidator *intValidator;
-    QString settingsFile;
-
-};
-
-#endif // SETTINGSDIALOG_H
+void Console::contextMenuEvent(QContextMenuEvent *e)
+{
+    Q_UNUSED(e)
+}

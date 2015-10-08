@@ -28,10 +28,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
+#include "console.h"
 #include "led.h"
 
 #include <QMessageBox>
-#include <QtSerialPort/QSerialPort>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    console = new Console;
     serial = new QSerialPort(this);
     settings = new SettingsDialog;    
 
@@ -49,10 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionConfigure->setEnabled(true);    
 
     initActionsConnections();
+    initSerialPort();
 
-    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this,
-            SLOT(handleError(QSerialPort::SerialPortError)));
-    connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
 
 }
 
@@ -60,6 +60,23 @@ MainWindow::~MainWindow()
 {
     delete settings;
     delete ui;
+}
+
+void MainWindow::initSerialPort()
+{
+    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
+    connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+}
+
+void MainWindow::initActionsConnections()
+{
+    connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
+    connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionConfigure, SIGNAL(triggered()), settings, SLOT(show()));
+    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+
 }
 
 void MainWindow::openSerialPort()
@@ -77,54 +94,52 @@ void MainWindow::openSerialPort()
     ui->Parity->setText(p.stringParity);
     ui->StopBits->setText(p.stringStopBits);
     ui->FlowControl->setText(p.stringFlowControl);
-    if (serial->open(QIODevice::ReadWrite)) {
+    if (serial->open(QIODevice::ReadWrite)) {            
+            console->putData("Connected");
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
-            ui->actionConfigure->setEnabled(false);            
-            ui->led->setColor("green");
+            ui->actionConfigure->setEnabled(false);
+            ui->status->setText("Online");
+            ui->led->setColor("green");            
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
+
     } else {
-        QMessageBox::critical(this, tr("Error"), serial->errorString());
-
-        ui->statusBar->showMessage(tr("Open error"));
+        QMessageBox::critical(this, tr("Error"), serial->errorString());        
+        ui->statusBar->showMessage(tr("Open error"));        
+        ui->status->setText("Offline");
         ui->led->setColor("red");
-    }
-    qDebug()<<"setPortName"<<p.name;
-    qDebug()<<"setBaudRate"<<p.baudRate;
-    qDebug()<<"setDataBits"<<p.dataBits;
-    qDebug()<<"setParity"<<p.parity;
-    qDebug()<<"setStopBits"<<p.stopBits;
-    qDebug()<<"setFlowControl"<<p.flowControl;
+        console->putData("Connected");
 
+    }
 }
 
 void MainWindow::closeSerialPort()
 {
     if (serial->isOpen())
-        serial->close();
+        serial->close();    
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
-    ui->statusBar->showMessage(tr("Disconnected"));
+    ui->statusBar->showMessage(tr("Disconnected"));    
+    ui->status->setText("Offline");
     ui->led->setColor("red");
-}
+    console->putData("Disconnected");
 
-void MainWindow::about()
-{
-    QMessageBox::about(this, tr("About COM Monitor"),
-                       tr("The <b>Com Monitor</b> (c) 2015."));
 }
 
 void MainWindow::writeData(const QByteArray &data)
 {
-    serial->write(data);
+    serial->write(data);    
+
 }
 
 void MainWindow::readData()
 {
     QByteArray data = serial->readAll();
+    console->putData(data);
+
 }
 
 void MainWindow::handleError(QSerialPort::SerialPortError error)
@@ -135,12 +150,8 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
     }
 }
 
-void MainWindow::initActionsConnections()
+void MainWindow::about()
 {
-    connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
-    connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
-    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(ui->actionConfigure, SIGNAL(triggered()), settings, SLOT(show()));
-    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-
+    QMessageBox::about(this, tr("About COM Monitor"),
+                       tr("The <b>Com Monitor</b> (c) 2015."));
 }
