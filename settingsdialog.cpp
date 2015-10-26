@@ -97,6 +97,7 @@ void SettingsDialog::showPortInfo(int idx)
 void SettingsDialog::apply()
 {
     updateSettings();
+    saveSettings();
     hide();
 }
 

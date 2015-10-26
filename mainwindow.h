@@ -51,12 +51,14 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:    
+private slots:
     void openSerialPort();
     void closeSerialPort();
     void about();
     void writeData(const QByteArray &data);
-    void readData();    
+    void readData();
+    void printData(QString data);
+    void refreshData();
     void handleError(QSerialPort::SerialPortError error);    
 
 private:

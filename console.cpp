@@ -1,5 +1,9 @@
 /****************************************************************************
 **
+** Copyright (C) 2012 Denis Shienkov <denis.shienkov@gmail.com>
+** Copyright (C) 2012 Laszlo Papp <lpapp@kde.org>
+** Contact: http://www.qt.io/licensing/
+**
 ** This file is part of the QtSerialPort module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:LGPL21$
@@ -29,49 +33,68 @@
 ****************************************************************************/
 
 #include "console.h"
+#include "ui_console.h"
 
 #include <QScrollBar>
-#include <QDebug>
+#include <QTextBlock>
+#include <QtCore/QDebug>
 
-Console::Console(QWidget *parent)
-    : QPlainTextEdit(parent)
-//    , localEchoEnabled(false)
+QT_USE_NAMESPACE
+
+Console::Console(QWidget *parent):
+    QPlainTextEdit(parent),
+    ui(new Ui::Console)
 {
+
+    ui->setupUi(this);
+
     document()->setMaximumBlockCount(100);
-/*    QPalette p = palette();
+    QPalette p = palette();
     p.setColor(QPalette::Base, Qt::black);
     p.setColor(QPalette::Text, Qt::green);
-    setPalette(p);*/
+    setPalette(p);
 
 }
 
-void Console::putData(const QByteArray &data)
+Console::~Console()
 {
+    delete ui;
+}
+
+void Console::putData(const QByteArray &data)
+{    
     insertPlainText(QString(data));
+    qDebug()<<"data= "<<data;
 
     QScrollBar *bar = verticalScrollBar();
     bar->setValue(bar->maximum());
 }
 
-/*
-void Console::setLocalEchoEnabled(bool set)
-{
-    localEchoEnabled = set;
-}*/
-
 void Console::keyPressEvent(QKeyEvent *e)
 {
+    QByteArray text;
+
     switch (e->key()) {
+
+    case Qt::Key_Return:
+        text = textCursor().block().text().toLocal8Bit();
+        qDebug()<<"text1 = "<<text;
+        emit getData(text+"\r");
+        QPlainTextEdit::keyPressEvent(e);
+        break;
+
     case Qt::Key_Backspace:
+        QPlainTextEdit::keyPressEvent(e);
     case Qt::Key_Left:
     case Qt::Key_Right:
     case Qt::Key_Up:
     case Qt::Key_Down:
         break;
+
     default:
-//        if (localEchoEnabled)
-          QPlainTextEdit::keyPressEvent(e);
-          emit getData(e->text().toLocal8Bit());
+        putData(e->text().toLocal8Bit());
+        qDebug()<<"text2 = "<<e;
+
     }
 }
 

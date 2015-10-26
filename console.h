@@ -37,18 +37,28 @@
 
 #include <QPlainTextEdit>
 
+QT_USE_NAMESPACE
+
+QT_BEGIN_NAMESPACE
+
+namespace Ui {
+class Console;
+}
+
+QT_END_NAMESPACE
+
 class Console : public QPlainTextEdit
 {
     Q_OBJECT
 
 signals:
-    void getData(const QByteArray &data);
+    void getData(const QByteArray &data);    
 
 public:
     explicit Console(QWidget *parent = 0);
+    ~Console();
 
     void putData(const QByteArray &data);
-//    void setLocalEchoEnabled(bool set);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
@@ -56,8 +66,8 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
     virtual void contextMenuEvent(QContextMenuEvent *e);
 
-//private:
-//    bool localEchoEnabled;
+private:
+    Ui::Console *ui;
 
 };
 

@@ -54,7 +54,7 @@ public:
     QLabel *vidLabel;
     QLabel *pidLabel;
     QGroupBox *additionalOptionsGroupBox;
-    QHBoxLayout *horizontalLayout_2;
+    QGridLayout *gridLayout_4;
     QPushButton *searchButton;
     QComboBox *serialPortInfoListBox;
     QSpacerItem *horizontalSpacer_3;
@@ -63,7 +63,8 @@ public:
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
-        SettingsDialog->resize(327, 312);
+        SettingsDialog->resize(327, 268);
+        SettingsDialog->setMaximumSize(QSize(16777215, 268));
         gridLayout_3 = new QGridLayout(SettingsDialog);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
         horizontalLayout = new QHBoxLayout();
@@ -181,12 +182,12 @@ public:
 
         additionalOptionsGroupBox = new QGroupBox(SettingsDialog);
         additionalOptionsGroupBox->setObjectName(QStringLiteral("additionalOptionsGroupBox"));
-        horizontalLayout_2 = new QHBoxLayout(additionalOptionsGroupBox);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        gridLayout_4 = new QGridLayout(additionalOptionsGroupBox);
+        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
         searchButton = new QPushButton(additionalOptionsGroupBox);
         searchButton->setObjectName(QStringLiteral("searchButton"));
 
-        horizontalLayout_2->addWidget(searchButton);
+        gridLayout_4->addWidget(searchButton, 0, 0, 1, 1);
 
         serialPortInfoListBox = new QComboBox(additionalOptionsGroupBox);
         serialPortInfoListBox->setObjectName(QStringLiteral("serialPortInfoListBox"));
@@ -198,11 +199,11 @@ public:
         serialPortInfoListBox->setMaximumSize(QSize(73, 22));
         serialPortInfoListBox->setLayoutDirection(Qt::LeftToRight);
 
-        horizontalLayout_2->addWidget(serialPortInfoListBox);
+        gridLayout_4->addWidget(serialPortInfoListBox, 0, 1, 1, 1);
 
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_2->addItem(horizontalSpacer_3);
+        gridLayout_4->addItem(horizontalSpacer_3, 0, 2, 1, 1);
 
 
         gridLayout_3->addWidget(additionalOptionsGroupBox, 0, 0, 1, 2);
@@ -239,7 +240,7 @@ public:
         locationLabel->setText(QApplication::translate("SettingsDialog", "Location:", 0));
         vidLabel->setText(QApplication::translate("SettingsDialog", "Vendor ID:", 0));
         pidLabel->setText(QApplication::translate("SettingsDialog", "Product ID:", 0));
-        additionalOptionsGroupBox->setTitle(QApplication::translate("SettingsDialog", "Search options", 0));
+        additionalOptionsGroupBox->setTitle(QApplication::translate("SettingsDialog", "Search Options", 0));
         searchButton->setText(QApplication::translate("SettingsDialog", "Search", 0));
     } // retranslateUi
 

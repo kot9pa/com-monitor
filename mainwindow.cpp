@@ -29,9 +29,10 @@
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
 #include "console.h"
-#include "led.h"
 
 #include <QMessageBox>
+#include <QLayout>
+
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -42,25 +43,33 @@ MainWindow::MainWindow(QWidget *parent) :
 
     console = new Console;
     serial = new QSerialPort(this);
-    settings = new SettingsDialog;    
+    settings = new SettingsDialog;
 
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionQuit->setEnabled(true);
-    ui->actionConfigure->setEnabled(true);    
+    ui->actionConfigure->setEnabled(true);
+    ui->actionRefresh->setEnabled(false);
+
+    /*QWidget *ui_console = new QWidget;
+    QHBoxLayout *console_layout = new QHBoxLayout;
+    console_layout->addWidget(console);    
+
+    ui_console->setLayout(console_layout);
+    ui_console->show();*/
 
     initActionsConnections();
     initSerialPort();
-
-    connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
 
 }
 
 MainWindow::~MainWindow()
 {
     delete settings;
+    delete console;
     delete ui;
 }
+
 
 void MainWindow::initSerialPort()
 {
@@ -70,12 +79,15 @@ void MainWindow::initSerialPort()
 
 void MainWindow::initActionsConnections()
 {
+    connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
     connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
     connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionConfigure, SIGNAL(triggered()), settings, SLOT(show()));
     connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
+    connect(ui->actionConsole, SIGNAL(triggered()), console, SLOT(show()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    connect(ui->actionRefresh, SIGNAL(triggered(bool)), this, SLOT(refreshData()));
 
 }
 
@@ -88,19 +100,12 @@ void MainWindow::openSerialPort()
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
-    ui->SerialPort->setText(p.name);
-    ui->BaudRate->setText(p.stringBaudRate);
-    ui->DataBits->setText(p.stringDataBits);
-    ui->Parity->setText(p.stringParity);
-    ui->StopBits->setText(p.stringStopBits);
-    ui->FlowControl->setText(p.stringFlowControl);
     if (serial->open(QIODevice::ReadWrite)) {            
-            console->putData("Connected");
+            printData("Connected");
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
             ui->actionConfigure->setEnabled(false);
-            ui->status->setText("Online");
-            ui->led->setColor("green");            
+            ui->actionRefresh->setEnabled(true);
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
@@ -108,9 +113,7 @@ void MainWindow::openSerialPort()
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());        
         ui->statusBar->showMessage(tr("Open error"));        
-        ui->status->setText("Offline");
-        ui->led->setColor("red");
-        console->putData("Connected");
+        printData("Connected");
 
     }
 }
@@ -122,16 +125,16 @@ void MainWindow::closeSerialPort()
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
+    ui->actionRefresh->setEnabled(false);
     ui->statusBar->showMessage(tr("Disconnected"));    
-    ui->status->setText("Offline");
-    ui->led->setColor("red");
-    console->putData("Disconnected");
+    printData("Disconnected");
 
 }
 
 void MainWindow::writeData(const QByteArray &data)
-{
-    serial->write(data);    
+{    
+    serial->write(data);
+    qDebug()<<"write = " << data;    
 
 }
 
@@ -139,6 +142,34 @@ void MainWindow::readData()
 {
     QByteArray data = serial->readAll();
     console->putData(data);
+    //printData(data);
+    qDebug()<<"read = " << data;
+
+}
+
+void MainWindow::printData(QString data)
+{
+    ui->console->textCursor().insertText(data+'\r');
+    ui->console->moveCursor(QTextCursor::End);
+    qDebug()<<"print = " << data;
+
+}
+
+void MainWindow::refreshData()
+{
+    /*char buffer[] = "AT";
+
+    int numWrite = serial->write(buffer);
+    QByteArray numRead = serial->readAll();
+
+    printData(QString::number(numWrite));
+    printData(numRead);
+
+    qDebug()<<"numWrite = " << numWrite;
+    qDebug()<<"numRead = " << numRead;*/
+
+    writeData("AT\r");
+    readData();
 
 }
 

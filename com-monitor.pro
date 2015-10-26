@@ -19,11 +19,11 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     settingsdialog.h \
-    led.h \
     console.h
 
 FORMS    += mainwindow.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    console.ui
 
 RESOURCES += \
     com-monitor.qrc
