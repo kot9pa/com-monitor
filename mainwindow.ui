@@ -68,11 +68,11 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="refresh">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>Refresh</string>
      </attribute>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="refreshBox">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -80,6 +80,19 @@
         <width>69</width>
         <height>21</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="refreshTime">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>10</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Refresh Interval (sec)</string>
       </property>
      </widget>
     </widget>

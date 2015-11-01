@@ -48,7 +48,7 @@ Console::Console(QWidget *parent):
 
     ui->setupUi(this);
 
-    document()->setMaximumBlockCount(100);
+    //document()->setMaximumBlockCount(100);
     QPalette p = palette();
     p.setColor(QPalette::Base, Qt::black);
     p.setColor(QPalette::Text, Qt::green);
@@ -62,12 +62,12 @@ Console::~Console()
 }
 
 void Console::putData(const QByteArray &data)
-{    
+{
     insertPlainText(QString(data));
-    qDebug()<<"data= "<<data;
+    qDebug()<<"data = "<<data;
 
-    QScrollBar *bar = verticalScrollBar();
-    bar->setValue(bar->maximum());
+    /*QScrollBar *bar = verticalScrollBar();
+    bar->setValue(bar->maximum());*/
 }
 
 void Console::keyPressEvent(QKeyEvent *e)
@@ -77,11 +77,11 @@ void Console::keyPressEvent(QKeyEvent *e)
     switch (e->key()) {
 
     case Qt::Key_Return:
-        text = textCursor().block().text().toLocal8Bit();
+        text = textCursor().block().text().toLocal8Bit();        
+        moveCursor(QTextCursor::Start);
         qDebug()<<"text1 = "<<text;
         emit getData(text+"\r");
-        QPlainTextEdit::keyPressEvent(e);
-        break;
+        clear();
 
     case Qt::Key_Backspace:
         QPlainTextEdit::keyPressEvent(e);

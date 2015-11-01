@@ -32,6 +32,9 @@
 
 #include <QMessageBox>
 #include <QLayout>
+#include <QDateTime>
+#include <QFile>
+#include <QTimer>
 
 #include <QDebug>
 
@@ -44,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     console = new Console;
     serial = new QSerialPort(this);
     settings = new SettingsDialog;
+    timer = new QTimer(this);
 
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
@@ -51,12 +55,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
 
-    /*QWidget *ui_console = new QWidget;
-    QHBoxLayout *console_layout = new QHBoxLayout;
-    console_layout->addWidget(console);    
+    ui->refreshBox->addItem(QStringLiteral("5"));
+    ui->refreshBox->addItem(QStringLiteral("10"));
+    ui->refreshBox->addItem(QStringLiteral("15"));
+    ui->refreshBox->setCurrentIndex(-1);
 
-    ui_console->setLayout(console_layout);
-    ui_console->show();*/
+    format = ("dd.MM.yy HH:mm:ss");
 
     initActionsConnections();
     initSerialPort();
@@ -70,6 +74,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::initTimer()
+{
+    int interval = ui->refreshBox->currentText().toInt();
+    if (serial->isOpen() && interval!=0) {
+    timer->setInterval(interval*1000);
+    timer->start();
+    }
+}
 
 void MainWindow::initSerialPort()
 {
@@ -80,14 +92,17 @@ void MainWindow::initSerialPort()
 void MainWindow::initActionsConnections()
 {
     connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
+    connect(timer, SIGNAL(timeout()), this, SLOT(refreshData()));
+    connect(ui->refreshBox, SIGNAL(activated(int)), this, SLOT(initTimer()));
     connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
     connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionConfigure, SIGNAL(triggered()), settings, SLOT(show()));
     connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
+    connect(ui->actionClear, SIGNAL(triggered()), ui->console, SLOT(clear()));
     connect(ui->actionConsole, SIGNAL(triggered()), console, SLOT(show()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(ui->actionRefresh, SIGNAL(triggered(bool)), this, SLOT(refreshData()));
+    connect(ui->actionRefresh, SIGNAL(triggered()), this, SLOT(refreshData()));
 
 }
 
@@ -100,8 +115,9 @@ void MainWindow::openSerialPort()
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
-    if (serial->open(QIODevice::ReadWrite)) {            
-            printData("Connected");
+    if (serial->open(QIODevice::ReadWrite)) {
+            initTimer();
+            printData("Connected to "+ p.name);
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
             ui->actionConfigure->setEnabled(false);
@@ -113,7 +129,7 @@ void MainWindow::openSerialPort()
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());        
         ui->statusBar->showMessage(tr("Open error"));        
-        printData("Connected");
+        printData("Error opened port");
 
     }
 }
@@ -121,35 +137,49 @@ void MainWindow::openSerialPort()
 void MainWindow::closeSerialPort()
 {
     if (serial->isOpen())
-        serial->close();    
+        serial->close();
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
     ui->statusBar->showMessage(tr("Disconnected"));    
     printData("Disconnected");
+    timer->stop();
 
 }
 
 void MainWindow::writeData(const QByteArray &data)
 {    
     serial->write(data);
-    qDebug()<<"write = " << data;    
+    qDebug()<<"write = " << data;
 
 }
 
 void MainWindow::readData()
 {
-    QByteArray data = serial->readAll();
-    console->putData(data);
-    //printData(data);
-    qDebug()<<"read = " << data;
+    serial->waitForReadyRead(500);
+
+    QByteArray byte = serial->readAll();
+    console->putData(byte);
+    //printData(byte);
+    //recordData(byte);
+    qDebug()<<"read = " << byte;
+
+    QByteArray dataArray(64, 0);
+    dataArray.insert(0, byte);
+
+    if(dataArray.at(0)=='\r' && dataArray.at(1)=='\n') {
+        printData(dataArray);
+        recordData(dataArray);
+        }
+    dataArray = 0;
 
 }
 
 void MainWindow::printData(QString data)
 {
-    ui->console->textCursor().insertText(data+'\r');
+    QString date = QDateTime::currentDateTime().toString(format);
+    ui->console->textCursor().insertText(date + '\n' + data +'\r');
     ui->console->moveCursor(QTextCursor::End);
     qDebug()<<"print = " << data;
 
@@ -157,20 +187,26 @@ void MainWindow::printData(QString data)
 
 void MainWindow::refreshData()
 {
-    /*char buffer[] = "AT";
+    if (serial->isOpen())
+        writeData("AT^MONP\r");
 
-    int numWrite = serial->write(buffer);
-    QByteArray numRead = serial->readAll();
+}
 
-    printData(QString::number(numWrite));
-    printData(numRead);
-
-    qDebug()<<"numWrite = " << numWrite;
-    qDebug()<<"numRead = " << numRead;*/
-
-    writeData("AT\r");
-    readData();
-
+void MainWindow::recordData(QString data)
+{
+    QString date = QDateTime::currentDateTime().toString(format);
+    QFile file("com-monitor.log");
+    if (file.open(QIODevice::Append | QIODevice::Text))
+    {
+        QTextStream out(&file);
+        out << date << endl << data << endl;
+        qDebug()<< "record = " << data;
+        file.close();
+    }
+    else
+    {
+        qWarning("Can not open file.");
+    }
 }
 
 void MainWindow::handleError(QSerialPort::SerialPortError error)

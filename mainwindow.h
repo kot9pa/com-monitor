@@ -54,22 +54,26 @@ public:
 private slots:
     void openSerialPort();
     void closeSerialPort();
+    void initTimer();
     void about();
     void writeData(const QByteArray &data);
     void readData();
     void printData(QString data);
+    void recordData(QString data);
     void refreshData();
     void handleError(QSerialPort::SerialPortError error);    
 
 private:
     void initActionsConnections();
-    void initSerialPort();
+    void initSerialPort();    
 
 private:
     Ui::MainWindow *ui;
     SettingsDialog *settings;
     QSerialPort *serial;
     Console *console;
+    QTimer *timer;
+    QString format;
 
 };
 

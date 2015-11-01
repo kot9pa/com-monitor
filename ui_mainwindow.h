@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -41,8 +42,9 @@ public:
     QAction *actionConsole;
     QWidget *centralWidget;
     QTabWidget *tabWidget;
-    QWidget *tab;
-    QComboBox *comboBox;
+    QWidget *refresh;
+    QComboBox *refreshBox;
+    QLabel *refreshTime;
     QWidget *tab_2;
     QPlainTextEdit *console;
     QMenuBar *menuBar;
@@ -123,12 +125,15 @@ public:
         tabWidget->setGeometry(QRect(0, 340, 451, 71));
         sizePolicy.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
         tabWidget->setSizePolicy(sizePolicy);
-        tab = new QWidget();
-        tab->setObjectName(QStringLiteral("tab"));
-        comboBox = new QComboBox(tab);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
-        comboBox->setGeometry(QRect(10, 10, 69, 21));
-        tabWidget->addTab(tab, QString());
+        refresh = new QWidget();
+        refresh->setObjectName(QStringLiteral("refresh"));
+        refreshBox = new QComboBox(refresh);
+        refreshBox->setObjectName(QStringLiteral("refreshBox"));
+        refreshBox->setGeometry(QRect(10, 10, 69, 21));
+        refreshTime = new QLabel(refresh);
+        refreshTime->setObjectName(QStringLiteral("refreshTime"));
+        refreshTime->setGeometry(QRect(90, 10, 111, 21));
+        tabWidget->addTab(refresh, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
         tabWidget->addTab(tab_2, QString());
@@ -224,7 +229,8 @@ public:
         actionRefresh->setShortcut(QApplication::translate("MainWindow", "Alt+U", 0));
         actionConsole->setText(QApplication::translate("MainWindow", "Console", 0));
         actionConsole->setShortcut(QApplication::translate("MainWindow", "Alt+C", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0));
+        refreshTime->setText(QApplication::translate("MainWindow", "Refresh Interval (sec)", 0));
+        tabWidget->setTabText(tabWidget->indexOf(refresh), QApplication::translate("MainWindow", "Refresh", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
         menuCalls->setTitle(QApplication::translate("MainWindow", "Calls", 0));
         menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0));
