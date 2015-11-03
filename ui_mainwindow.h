@@ -19,9 +19,9 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -45,8 +45,10 @@ public:
     QWidget *refresh;
     QComboBox *refreshBox;
     QLabel *refreshTime;
-    QWidget *tab_2;
-    QPlainTextEdit *console;
+    QWidget *log;
+    QLabel *loglevelTime;
+    QComboBox *loglevelBox;
+    QTableWidget *tableWidget;
     QMenuBar *menuBar;
     QMenu *menuCalls;
     QMenu *menuTools;
@@ -134,13 +136,42 @@ public:
         refreshTime->setObjectName(QStringLiteral("refreshTime"));
         refreshTime->setGeometry(QRect(90, 10, 111, 21));
         tabWidget->addTab(refresh, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QStringLiteral("tab_2"));
-        tabWidget->addTab(tab_2, QString());
-        console = new QPlainTextEdit(centralWidget);
-        console->setObjectName(QStringLiteral("console"));
-        console->setGeometry(QRect(0, 0, 451, 341));
-        console->setReadOnly(true);
+        log = new QWidget();
+        log->setObjectName(QStringLiteral("log"));
+        loglevelTime = new QLabel(log);
+        loglevelTime->setObjectName(QStringLiteral("loglevelTime"));
+        loglevelTime->setGeometry(QRect(120, 10, 61, 21));
+        loglevelBox = new QComboBox(log);
+        loglevelBox->setObjectName(QStringLiteral("loglevelBox"));
+        loglevelBox->setGeometry(QRect(10, 10, 81, 20));
+        loglevelBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+        tabWidget->addTab(log, QString());
+        tableWidget = new QTableWidget(centralWidget);
+        if (tableWidget->columnCount() < 5)
+            tableWidget->setColumnCount(5);
+        QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
+        tableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem);
+        QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
+        tableWidget->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+        QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
+        tableWidget->setHorizontalHeaderItem(2, __qtablewidgetitem2);
+        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+        tableWidget->setHorizontalHeaderItem(3, __qtablewidgetitem3);
+        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
+        tableWidget->setHorizontalHeaderItem(4, __qtablewidgetitem4);
+        tableWidget->setObjectName(QStringLiteral("tableWidget"));
+        tableWidget->setGeometry(QRect(0, 0, 451, 341));
+        tableWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+        tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+        tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+        tableWidget->setSortingEnabled(false);
+        tableWidget->setColumnCount(5);
+        tableWidget->horizontalHeader()->setDefaultSectionSize(100);
+        tableWidget->horizontalHeader()->setMinimumSectionSize(37);
+        tableWidget->horizontalHeader()->setProperty("showSortIndicator", QVariant(false));
+        tableWidget->verticalHeader()->setDefaultSectionSize(30);
+        tableWidget->verticalHeader()->setProperty("showSortIndicator", QVariant(false));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -190,7 +221,7 @@ public:
         QObject::connect(actionToolBar, SIGNAL(toggled(bool)), mainToolBar, SLOT(setVisible(bool)));
         QObject::connect(actionStatusBar, SIGNAL(toggled(bool)), statusBar, SLOT(setVisible(bool)));
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -231,7 +262,18 @@ public:
         actionConsole->setShortcut(QApplication::translate("MainWindow", "Alt+C", 0));
         refreshTime->setText(QApplication::translate("MainWindow", "Refresh Interval (sec)", 0));
         tabWidget->setTabText(tabWidget->indexOf(refresh), QApplication::translate("MainWindow", "Refresh", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
+        loglevelTime->setText(QApplication::translate("MainWindow", "Log Level", 0));
+        tabWidget->setTabText(tabWidget->indexOf(log), QApplication::translate("MainWindow", "Log", 0));
+        QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
+        ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "ID", 0));
+        QTableWidgetItem *___qtablewidgetitem1 = tableWidget->horizontalHeaderItem(1);
+        ___qtablewidgetitem1->setText(QApplication::translate("MainWindow", "Date", 0));
+        QTableWidgetItem *___qtablewidgetitem2 = tableWidget->horizontalHeaderItem(2);
+        ___qtablewidgetitem2->setText(QApplication::translate("MainWindow", "Sensor", 0));
+        QTableWidgetItem *___qtablewidgetitem3 = tableWidget->horizontalHeaderItem(3);
+        ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Status", 0));
+        QTableWidgetItem *___qtablewidgetitem4 = tableWidget->horizontalHeaderItem(4);
+        ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Message", 0));
         menuCalls->setTitle(QApplication::translate("MainWindow", "Calls", 0));
         menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0));
