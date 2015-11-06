@@ -59,10 +59,10 @@ private slots:
     void initTimer();
     void about();
     void writeData(const QByteArray &data);
+    void initData();
     void readData();
     void clearData();
-    void showData();
-    void printData(QString data);
+    void queryData(QString data);
     void recordData(QString data);
     void processData(QByteArray data);
     void refreshData();

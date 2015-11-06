@@ -66,8 +66,8 @@ void Console::putData(const QByteArray &data)
     insertPlainText(QString(data));
     qDebug()<<"data = "<<data;
 
-    /*QScrollBar *bar = verticalScrollBar();
-    bar->setValue(bar->maximum());*/
+    QScrollBar *bar = verticalScrollBar();
+    bar->setValue(bar->maximum());
 }
 
 void Console::keyPressEvent(QKeyEvent *e)

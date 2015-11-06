@@ -31,7 +31,6 @@
 #include "console.h"
 
 #include <QMessageBox>
-#include <QLayout>
 #include <QDateTime>
 #include <QFile>
 #include <QTimer>
@@ -71,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->refreshBox->addItem(QStringLiteral("15"));
     ui->refreshBox->setCurrentIndex(-1);
 
-    ui->loglevelBox->addItem(tr("All"));
+    ui->loglevelBox->addItem(tr("All (AA)"));
     ui->loglevelBox->addItem(tr("Info (II)"));
     ui->loglevelBox->addItem(tr("Warning (WW)"));
     ui->loglevelBox->addItem(tr("Error (EE)"));
@@ -82,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initActionsConnections();
     initSerialPort();
     initTable();
+    initData();
 
 }
 
@@ -114,6 +114,7 @@ void MainWindow::initActionsConnections()
     connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
     connect(timer, SIGNAL(timeout()), this, SLOT(refreshData()));
     connect(ui->refreshBox, SIGNAL(activated(int)), this, SLOT(initTimer()));
+    connect(ui->loglevelBox, SIGNAL(activated(int)), this, SLOT(initData()));
     connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
     connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
@@ -129,7 +130,7 @@ void MainWindow::initActionsConnections()
 void MainWindow::initTable()
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("sql_db.sqlite");
+    db.setDatabaseName("com-monitor.sqlite");
     if (!db.open()) {
         QMessageBox::critical(0, qApp->tr("Cannot open database"),
         qApp->tr("Unable to establish a database connection.\n"
@@ -141,18 +142,10 @@ void MainWindow::initTable()
     QSqlQuery query("CREATE TABLE tabMain ("
            "id INTEGER primary key, "
            "datetime DATETIME, "
-           "sensor VARCHAR(4), "
-           "status VARCHAR(4), "
+           "sensor INTEGER, "
+           "status INTEGER, "
            "message VARCHAR(255)"
            ")");
-}
-
-void MainWindow::clearData()
-{
-    QSqlQuery query;
-    query.exec("DELETE FROM tabMain");
-
-    showData();
 }
 
 void MainWindow::openSerialPort()
@@ -166,7 +159,7 @@ void MainWindow::openSerialPort()
     serial->setFlowControl(p.flowControl);
     if (serial->open(QIODevice::ReadWrite)) {
             initTimer();
-            printData("Connected to "+ p.name);
+            //console->putData("Connected to "+ p.name);
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
             ui->actionConfigure->setEnabled(false);
@@ -178,7 +171,7 @@ void MainWindow::openSerialPort()
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());        
         ui->statusBar->showMessage(tr("Open error"));        
-        printData("Error opened port");
+        //console->putData("Error opened port");
 
     }
 }
@@ -192,7 +185,7 @@ void MainWindow::closeSerialPort()
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
     ui->statusBar->showMessage(tr("Disconnected"));    
-    printData("Disconnected");
+    //console->putData("Disconnected");
     timer->stop();
 
 }
@@ -210,8 +203,7 @@ void MainWindow::readData()
 
     QByteArray byte = serial->readAll();
     console->putData(byte);
-    //printData(byte);
-    //recordData(byte);
+
     qDebug()<<"read = " << byte;
 
     QByteArray dataArray(65536, 0);
@@ -227,56 +219,93 @@ void MainWindow::readData()
 
 void MainWindow::processData(QByteArray data)
 {
-     QSqlQuery query;
-     query.prepare("INSERT INTO tabMain (id, datetime, sensor, status, message) "
-                   "VALUES (null , :datetime, :sensor, :status, :message)");
-     query.bindValue(":datetime", QDateTime::currentDateTime());
-     query.bindValue(":sensor", data.mid(39, 2));
-     qDebug()<<"sensor = " << data.mid(39, 2);
-     query.bindValue(":status", data.mid(44, 2));
-     qDebug()<<"status = " << data.mid(44, 2);
-     query.bindValue(":message", data.mid(46, 24));
-     qDebug()<<"message = " << data.mid(46, 24);
-     query.exec();
+    QSqlQuery query;
+    query.prepare("INSERT INTO tabMain (id, datetime, sensor, status, message) "
+                  "VALUES (null , :datetime, :sensor, :status, :message)");
+    query.bindValue(":datetime", QDateTime::currentDateTime());
+    query.bindValue(":sensor", data.mid(39, 2).toInt());
+    qDebug()<<"sensor = " << data.mid(39, 2);
+    query.bindValue(":status", data.mid(44, 1).toInt());
+    qDebug()<<"status = " << data.mid(44, 1);
+    query.bindValue(":message", data.mid(47, 23));
+    qDebug()<<"message = " << data.mid(47, 23);
+    query.exec();
 
-     showData();
+    initData();
 }
 
-void MainWindow::showData()
+void MainWindow::queryData(QString data)
 {
-     int n = ui->tableWidget->rowCount();
-     for( int i = 0; i < n; i++ ) ui->tableWidget->removeRow( 0 );
+    int n = ui->tableWidget->rowCount();
+    for( int i = 0; i < n; i++ ) ui->tableWidget->removeRow( 0 );
 
-     QSqlQuery query;
-     query.exec("SELECT * FROM tabMain");
+    QSqlQuery query(data);
+    query.exec();
 
-     while (query.next())
-     {
-          ui->tableWidget->insertRow(0);
-          ui->tableWidget->setRowHeight(0, 20);
-          ui->tableWidget->setItem(0, 0, new QTableWidgetItem(query.value(0).toInt()));
-          ui->tableWidget->setItem(0, 1, new QTableWidgetItem(query.value(1).toDateTime().toString()));
-          ui->tableWidget->setItem(0, 2, new QTableWidgetItem(query.value(2).toString()));
-          ui->tableWidget->setItem(0, 3, new QTableWidgetItem(query.value(3).toString()));
-          ui->tableWidget->setItem(0, 4, new QTableWidgetItem(query.value(4).toString()));
+    //qDebug()<<query.isValid();
+    //qDebug()<<query.lastError();
 
-     }
+    while (query.next())
+    {
+        ui->tableWidget->insertRow(0);
+        ui->tableWidget->setRowHeight(0, 20);
+        ui->tableWidget->setItem(0, 0, new QTableWidgetItem(query.value(0).toInt()));
+        ui->tableWidget->setItem(0, 1, new QTableWidgetItem(query.value(1).toDateTime().toString()));
+        ui->tableWidget->setItem(0, 2, new QTableWidgetItem(query.value(2).toString()));
+        ui->tableWidget->setItem(0, 3, new QTableWidgetItem(query.value(3).toString()));
+        ui->tableWidget->setItem(0, 4, new QTableWidgetItem(query.value(4).toString()));
+
+        QString status = query.value(3).toString();
+
+        if (status=="8") {
+            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::green);
+            }
+        else if (status=="7" || status=="9") {
+            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::yellow);
+            }
+        else for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::red);
+
+    }
+
 }
 
-void MainWindow::printData(QString data)
+void MainWindow::initData()
 {
-    QTextCharFormat color;
-    color.setFontWeight( QFont::DemiBold );
-    color.setForeground( QBrush( QColor( "green" ) ) );
+    int level = ui->loglevelBox->currentIndex();
+    qDebug()<<"logLevel = " << level;
+    QString data;
 
-    QString date = QDateTime::currentDateTime().toString(format);
+    switch (level) {
+    case 0:
+        data = "SELECT * FROM tabMain";
+        queryData(data);
+        break;
 
-    /*ui->console->mergeCurrentCharFormat(color);
-    ui->console->textCursor().insertText(date + '\n' + data +'\r');
-    ui->console->moveCursor(QTextCursor::End);*/
+    case 1:
+        data = "SELECT * FROM tabMain WHERE status=8";
+        queryData(data);
+        break;
 
-    qDebug()<<"print = " << data;
+    case 2:
+        data = "SELECT * FROM tabMain WHERE status IN (7,9)";
+        queryData(data);
+        break;
 
+    case 3:
+        data = "SELECT * FROM tabMain WHERE status NOT IN (7,8,9)";
+        queryData(data);
+        break;
+
+    }
+
+}
+
+void MainWindow::clearData()
+{
+    QSqlQuery query;
+    query.exec("DELETE FROM tabMain");
+
+    initData();
 }
 
 void MainWindow::refreshData()
