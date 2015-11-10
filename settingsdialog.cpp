@@ -122,6 +122,11 @@ void SettingsDialog::checkCustomDevicePathPolicy(int idx)
 
 void SettingsDialog::fillPortsParameters()
 {
+    ui->refreshBox->addItem(QStringLiteral("5"));
+    ui->refreshBox->addItem(QStringLiteral("10"));
+    ui->refreshBox->addItem(QStringLiteral("15"));
+    ui->refreshBox->setCurrentIndex(-1);
+
     ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
     ui->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
     ui->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
@@ -158,7 +163,7 @@ void SettingsDialog::fillPortsInfo()
     QString manufacturer;
     QString serialNumber;
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        QStringList list;
+        QStringList list;        
         description = info.description();
         manufacturer = info.manufacturer();
         serialNumber = info.serialNumber();
@@ -179,6 +184,7 @@ void SettingsDialog::fillPortsInfo()
 void SettingsDialog::updateSettings()
 {
     currentSettings.name = ui->serialPortInfoListBox->currentText();
+    currentSettings.refresh = ui->refreshBox->currentText().toInt();
 
     if (ui->baudRateBox->currentIndex() == 4) {
         currentSettings.baudRate = ui->baudRateBox->currentText().toInt();
@@ -217,7 +223,8 @@ void SettingsDialog::saveSettings()
     settings.setValue("DataBits", ui->dataBitsBox->currentText());
     settings.setValue("Parity", ui->parityBox->currentText());
     settings.setValue("StopBits", ui->stopBitsBox->currentText());
-    settings.setValue("FlowControl", ui->flowControlBox->currentText());    
+    settings.setValue("FlowControl", ui->flowControlBox->currentText());
+    settings.setValue("Refresh", ui->refreshBox->currentText());
 
 }
 
@@ -232,5 +239,6 @@ void SettingsDialog::loadSettings()
     ui->parityBox->setCurrentText(settings.value("Parity").toString());
     ui->stopBitsBox->setCurrentText(settings.value("StopBits").toString());
     ui->flowControlBox->setCurrentText(settings.value("FlowControl").toString());
+    ui->refreshBox->setCurrentText(settings.value("Refresh").toString());
 
 }

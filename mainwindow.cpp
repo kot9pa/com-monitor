@@ -35,6 +35,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QFileDialog>
+#include <QSettings>
 
 #include <QDebug>
 
@@ -55,48 +56,40 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
 
-    /*ui->tableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("ID")));
-    ui->tableWidget->setHorizontalHeaderItem(1, new QTableWidgetItem(tr("Date")));
-    ui->tableWidget->setHorizontalHeaderItem(2, new QTableWidgetItem(tr("Sensor")));
-    ui->tableWidget->setHorizontalHeaderItem(3, new QTableWidgetItem(tr("Status")));
-    ui->tableWidget->setColumnWidth(1,250);
-    ui->tableWidget->setColumnWidth(2,20);
-    ui->tableWidget->setColumnWidth(3,500);*/
+    ui->logLevelBox->addItem(tr("All (AA)"));
+    ui->logLevelBox->addItem(tr("Info (II)"));
+    ui->logLevelBox->addItem(tr("Warning (WW)"));
+    ui->logLevelBox->addItem(tr("Error (EE)"));
 
     ui->tableWidget->setColumnHidden(0, true);
-
-    ui->refreshBox->addItem(QStringLiteral("5"));
-    ui->refreshBox->addItem(QStringLiteral("10"));
-    ui->refreshBox->addItem(QStringLiteral("15"));
-    ui->refreshBox->setCurrentIndex(-1);
-
-    ui->loglevelBox->addItem(tr("All (AA)"));
-    ui->loglevelBox->addItem(tr("Info (II)"));
-    ui->loglevelBox->addItem(tr("Warning (WW)"));
-    ui->loglevelBox->addItem(tr("Error (EE)"));
-    ui->loglevelBox->setCurrentIndex(0);
+    ui->dateTimeEdit->setDate(QDate::currentDate());
 
     format = ("dd.MM.yy HH:mm:ss");
+
+    settingsFile = QApplication::applicationDirPath() + "/com-monitor.ini";
+
+    loadSettings();
 
     initActionsConnections();
     initSerialPort();
     initTable();
-    initData();
+    fillSensorInfo();
+    fillDataInfo();
 
 }
 
 MainWindow::~MainWindow()
 {
     db.close();
+    saveSettings();
 
     delete settings;
     delete console;
     delete ui;
 }
 
-void MainWindow::initTimer()
-{
-    int interval = ui->refreshBox->currentText().toInt();
+void MainWindow::initTimer(int interval)
+{    
     if (serial->isOpen() && interval!=0) {
     timer->setInterval(interval*1000);
     timer->start();
@@ -113,8 +106,10 @@ void MainWindow::initActionsConnections()
 {
     connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
     connect(timer, SIGNAL(timeout()), this, SLOT(refreshData()));
-    connect(ui->refreshBox, SIGNAL(activated(int)), this, SLOT(initTimer()));
-    connect(ui->loglevelBox, SIGNAL(activated(int)), this, SLOT(initData()));
+    connect(ui->sensorCheck, SIGNAL(toggled(bool)), this, SLOT(sensorView()));
+    connect(ui->sensorBox, SIGNAL(activated(int)), this, SLOT(fillDataInfo()));
+    connect(ui->dateTimeEdit, SIGNAL(dateChanged(QDate)), this, SLOT(fillDataInfo()));
+    connect(ui->logLevelBox, SIGNAL(activated(int)), this, SLOT(fillDataInfo()));
     connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
     connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
@@ -158,7 +153,7 @@ void MainWindow::openSerialPort()
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
     if (serial->open(QIODevice::ReadWrite)) {
-            initTimer();
+            initTimer(p.refresh);
             //console->putData("Connected to "+ p.name);
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
@@ -231,10 +226,88 @@ void MainWindow::processData(QByteArray data)
     qDebug()<<"message = " << data.mid(47, 23);
     query.exec();
 
-    initData();
+    //fillSensorInfo();
+    fillDataInfo();
 }
 
-void MainWindow::queryData(QString data)
+void MainWindow::fillDataInfo()
+{    
+    int level = ui->logLevelBox->currentIndex();
+    QString date = ui->dateTimeEdit->date().toString("yyyy-MM-dd");
+    QString sensor;
+    QString data;
+
+    fillSensorInfo();
+
+    if(ui->sensorCheck->isChecked()) {
+        ui->sensorBox->setCurrentIndex(ui->sensorBox->findText("All"));
+        sensor = ui->sensorBox->itemData(ui->sensorBox->currentIndex()).toString();
+    } else  {
+        ui->sensorBox->removeItem(ui->sensorBox->findText("All"));
+        sensor = ui->sensorBox->currentText();
+    }
+
+    qDebug()<<"logLevel = " << level;
+    qDebug()<<"sensor = " << sensor;
+
+    switch (level) {
+    case 0:
+        data = "SELECT * FROM tabMain "
+               "WHERE date(datetime) = '%1' AND sensor IN (%2)"; //ALL
+        viewData(data.arg(date).arg(sensor));
+        break;
+
+    case 1:
+        data = "SELECT * FROM tabMain WHERE status NOT IN (6,7,8,9) "
+               "AND date(datetime) = '%1' AND sensor IN (%2)"; //INFO
+        viewData(data.arg(date).arg(sensor));
+        break;
+
+    case 2:
+        data = "SELECT * FROM tabMain WHERE status IN (8,9) "
+               "AND date(datetime) = '%1' AND sensor IN (%2)"; //WARNING
+        viewData(data.arg(date).arg(sensor));
+        break;
+
+    case 3:
+        data = "SELECT * FROM tabMain WHERE status IN (6,7) "
+               "AND date(datetime) = '%1' AND sensor IN (%2)"; //ERROR
+        viewData(data.arg(date).arg(sensor));
+        break;
+
+    }
+
+}
+
+void MainWindow::fillSensorInfo()
+{
+    QStringList list;
+    QSqlQuery query;
+    QString last = ui->sensorBox->currentText();
+    QString date = ui->dateTimeEdit->date().toString("yyyy-MM-dd");
+    query.prepare(QString("SELECT DISTINCT sensor FROM tabMain WHERE date(datetime) = '%1'").arg(date));
+    query.exec();
+    qDebug()<<query.lastQuery();
+    while(query.next()) {
+        list.append(query.value(0).toString());
+
+    }
+    ui->sensorBox->clear();
+    ui->sensorBox->addItems(list);
+    ui->sensorBox->addItem(tr("All"), list.join(", "));
+    ui->sensorBox->setCurrentText(last);
+
+}
+
+void MainWindow::sensorView()
+{
+    ui->sensorBox->setDisabled(ui->sensorCheck->isChecked());
+    //fillSensorInfo();
+    fillDataInfo();
+
+}
+
+void MainWindow::viewData(QString data)
 {
     int n = ui->tableWidget->rowCount();
     for( int i = 0; i < n; i++ ) ui->tableWidget->removeRow( 0 );
@@ -244,6 +317,7 @@ void MainWindow::queryData(QString data)
 
     //qDebug()<<query.isValid();
     //qDebug()<<query.lastError();
+    qDebug()<<query.lastQuery();
 
     while (query.next())
     {
@@ -257,44 +331,13 @@ void MainWindow::queryData(QString data)
 
         QString status = query.value(3).toString();
 
-        if (status=="8") {
-            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::green);
+        if (status=="6" || status=="7") {
+            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::red);
             }
-        else if (status=="7" || status=="9") {
+        else if (status=="8" || status=="9") {
             for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::yellow);
             }
-        else for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::red);
-
-    }
-
-}
-
-void MainWindow::initData()
-{
-    int level = ui->loglevelBox->currentIndex();
-    qDebug()<<"logLevel = " << level;
-    QString data;
-
-    switch (level) {
-    case 0:
-        data = "SELECT * FROM tabMain";
-        queryData(data);
-        break;
-
-    case 1:
-        data = "SELECT * FROM tabMain WHERE status=8";
-        queryData(data);
-        break;
-
-    case 2:
-        data = "SELECT * FROM tabMain WHERE status IN (7,9)";
-        queryData(data);
-        break;
-
-    case 3:
-        data = "SELECT * FROM tabMain WHERE status NOT IN (7,8,9)";
-        queryData(data);
-        break;
+        else for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::green);
 
     }
 
@@ -305,7 +348,7 @@ void MainWindow::clearData()
     QSqlQuery query;
     query.exec("DELETE FROM tabMain");
 
-    initData();
+    fillDataInfo();
 }
 
 void MainWindow::refreshData()
@@ -338,6 +381,31 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
         QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
         closeSerialPort();
     }
+}
+
+void MainWindow::saveSettings()
+{
+ QSettings settings(settingsFile, QSettings::IniFormat);
+
+ qDebug()<<"settingsFile2"<<settingsFile;
+
+    settings.setValue("LogLevel", ui->logLevelBox->currentText());
+    settings.setValue("LogLevelIndex", ui->logLevelBox->currentIndex());
+    settings.setValue("Sensor", ui->sensorBox->currentText());
+    settings.setValue("SensorCheckAll", ui->sensorCheck->isChecked());
+
+}
+
+void MainWindow::loadSettings()
+{
+ QSettings settings(settingsFile, QSettings::IniFormat);
+
+    ui->logLevelBox->setCurrentText(settings.value("LogLevel").toString());
+    ui->logLevelBox->setCurrentIndex(settings.value("LogLevelIndex").toInt());
+    ui->sensorBox->setCurrentText(settings.value("Sensor").toString());
+    ui->sensorBox->setDisabled(settings.value("SensorCheckAll").toBool());
+    ui->sensorCheck->setChecked(settings.value("SensorCheckAll").toBool());
+
 }
 
 void MainWindow::about()

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>327</width>
+    <width>354</width>
     <height>268</height>
    </rect>
   </property>
@@ -161,20 +161,20 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0">
     <widget class="QGroupBox" name="additionalOptionsGroupBox">
      <property name="title">
       <string>Search Options</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
        <widget class="QPushButton" name="searchButton">
         <property name="text">
          <string>Search</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item>
        <widget class="QComboBox" name="serialPortInfoListBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -193,18 +193,24 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="refreshOption">
+     <property name="title">
+      <string>Refresh Options</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="refreshLabel">
+        <property name="text">
+         <string>Interval (sec)</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="refreshBox"/>
       </item>
      </layout>
     </widget>

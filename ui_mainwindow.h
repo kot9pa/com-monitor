@@ -13,16 +13,21 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDateTimeEdit>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -41,14 +46,19 @@ public:
     QAction *actionRefresh;
     QAction *actionConsole;
     QWidget *centralWidget;
-    QTabWidget *tabWidget;
-    QWidget *refresh;
-    QComboBox *refreshBox;
-    QLabel *refreshTime;
-    QWidget *log;
-    QLabel *loglevelTime;
-    QComboBox *loglevelBox;
+    QVBoxLayout *verticalLayout_2;
+    QVBoxLayout *verticalLayout;
     QTableWidget *tableWidget;
+    QTabWidget *tabWidget;
+    QWidget *log;
+    QHBoxLayout *horizontalLayout;
+    QDateTimeEdit *dateTimeEdit;
+    QLabel *loglevelTime;
+    QComboBox *logLevelBox;
+    QLabel *sensorNumber;
+    QComboBox *sensorBox;
+    QCheckBox *sensorCheck;
+    QSpacerItem *horizontalSpacer;
     QMenuBar *menuBar;
     QMenu *menuCalls;
     QMenu *menuTools;
@@ -62,14 +72,14 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->setWindowModality(Qt::NonModal);
-        MainWindow->resize(451, 483);
+        MainWindow->resize(451, 493);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
         MainWindow->setSizePolicy(sizePolicy);
-        MainWindow->setMinimumSize(QSize(451, 483));
-        MainWindow->setMaximumSize(QSize(451, 483));
+        MainWindow->setMinimumSize(QSize(451, 493));
+        MainWindow->setMaximumSize(QSize(16777215, 16777215));
         MainWindow->setCursor(QCursor(Qt::ArrowCursor));
         MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
         MainWindow->setLayoutDirection(Qt::LeftToRight);
@@ -122,30 +132,14 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         centralWidget->setEnabled(true);
         centralWidget->setLayoutDirection(Qt::LeftToRight);
-        tabWidget = new QTabWidget(centralWidget);
-        tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(0, 340, 451, 71));
-        sizePolicy.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
-        tabWidget->setSizePolicy(sizePolicy);
-        refresh = new QWidget();
-        refresh->setObjectName(QStringLiteral("refresh"));
-        refreshBox = new QComboBox(refresh);
-        refreshBox->setObjectName(QStringLiteral("refreshBox"));
-        refreshBox->setGeometry(QRect(10, 10, 69, 21));
-        refreshTime = new QLabel(refresh);
-        refreshTime->setObjectName(QStringLiteral("refreshTime"));
-        refreshTime->setGeometry(QRect(90, 10, 111, 21));
-        tabWidget->addTab(refresh, QString());
-        log = new QWidget();
-        log->setObjectName(QStringLiteral("log"));
-        loglevelTime = new QLabel(log);
-        loglevelTime->setObjectName(QStringLiteral("loglevelTime"));
-        loglevelTime->setGeometry(QRect(120, 10, 61, 21));
-        loglevelBox = new QComboBox(log);
-        loglevelBox->setObjectName(QStringLiteral("loglevelBox"));
-        loglevelBox->setGeometry(QRect(10, 10, 81, 20));
-        loglevelBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-        tabWidget->addTab(log, QString());
+        verticalLayout_2 = new QVBoxLayout(centralWidget);
+        verticalLayout_2->setSpacing(0);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setSpacing(0);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         tableWidget = new QTableWidget(centralWidget);
         if (tableWidget->columnCount() < 5)
             tableWidget->setColumnCount(5);
@@ -160,7 +154,7 @@ public:
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
         tableWidget->setHorizontalHeaderItem(4, __qtablewidgetitem4);
         tableWidget->setObjectName(QStringLiteral("tableWidget"));
-        tableWidget->setGeometry(QRect(0, 0, 451, 341));
+        tableWidget->setMinimumSize(QSize(441, 341));
         tableWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
         tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -172,6 +166,67 @@ public:
         tableWidget->horizontalHeader()->setProperty("showSortIndicator", QVariant(false));
         tableWidget->verticalHeader()->setDefaultSectionSize(30);
         tableWidget->verticalHeader()->setProperty("showSortIndicator", QVariant(false));
+
+        verticalLayout->addWidget(tableWidget);
+
+        tabWidget = new QTabWidget(centralWidget);
+        tabWidget->setObjectName(QStringLiteral("tabWidget"));
+        tabWidget->setEnabled(true);
+        sizePolicy.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
+        tabWidget->setSizePolicy(sizePolicy);
+        tabWidget->setMinimumSize(QSize(441, 71));
+        tabWidget->setTabsClosable(false);
+        log = new QWidget();
+        log->setObjectName(QStringLiteral("log"));
+        horizontalLayout = new QHBoxLayout(log);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        dateTimeEdit = new QDateTimeEdit(log);
+        dateTimeEdit->setObjectName(QStringLiteral("dateTimeEdit"));
+        dateTimeEdit->setCalendarPopup(true);
+
+        horizontalLayout->addWidget(dateTimeEdit);
+
+        loglevelTime = new QLabel(log);
+        loglevelTime->setObjectName(QStringLiteral("loglevelTime"));
+
+        horizontalLayout->addWidget(loglevelTime);
+
+        logLevelBox = new QComboBox(log);
+        logLevelBox->setObjectName(QStringLiteral("logLevelBox"));
+        logLevelBox->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+
+        horizontalLayout->addWidget(logLevelBox);
+
+        sensorNumber = new QLabel(log);
+        sensorNumber->setObjectName(QStringLiteral("sensorNumber"));
+
+        horizontalLayout->addWidget(sensorNumber);
+
+        sensorBox = new QComboBox(log);
+        sensorBox->setObjectName(QStringLiteral("sensorBox"));
+        sensorBox->setEnabled(true);
+        sensorBox->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+
+        horizontalLayout->addWidget(sensorBox);
+
+        sensorCheck = new QCheckBox(log);
+        sensorCheck->setObjectName(QStringLiteral("sensorCheck"));
+
+        horizontalLayout->addWidget(sensorCheck);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
+
+        tabWidget->addTab(log, QString());
+
+        verticalLayout->addWidget(tabWidget);
+
+
+        verticalLayout_2->addLayout(verticalLayout);
+
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -221,7 +276,7 @@ public:
         QObject::connect(actionToolBar, SIGNAL(toggled(bool)), mainToolBar, SLOT(setVisible(bool)));
         QObject::connect(actionStatusBar, SIGNAL(toggled(bool)), statusBar, SLOT(setVisible(bool)));
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -260,10 +315,6 @@ public:
         actionRefresh->setShortcut(QApplication::translate("MainWindow", "Alt+U", 0));
         actionConsole->setText(QApplication::translate("MainWindow", "Console", 0));
         actionConsole->setShortcut(QApplication::translate("MainWindow", "Alt+C", 0));
-        refreshTime->setText(QApplication::translate("MainWindow", "Refresh Interval (sec)", 0));
-        tabWidget->setTabText(tabWidget->indexOf(refresh), QApplication::translate("MainWindow", "Refresh", 0));
-        loglevelTime->setText(QApplication::translate("MainWindow", "Log Level", 0));
-        tabWidget->setTabText(tabWidget->indexOf(log), QApplication::translate("MainWindow", "Log", 0));
         QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "ID", 0));
         QTableWidgetItem *___qtablewidgetitem1 = tableWidget->horizontalHeaderItem(1);
@@ -274,6 +325,11 @@ public:
         ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Status", 0));
         QTableWidgetItem *___qtablewidgetitem4 = tableWidget->horizontalHeaderItem(4);
         ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Message", 0));
+        dateTimeEdit->setDisplayFormat(QApplication::translate("MainWindow", "dd.MM.yyyy", 0));
+        loglevelTime->setText(QApplication::translate("MainWindow", "Log Level:", 0));
+        sensorNumber->setText(QApplication::translate("MainWindow", "Sensor:", 0));
+        sensorCheck->setText(QApplication::translate("MainWindow", "All Sensors", 0));
+        tabWidget->setTabText(tabWidget->indexOf(log), QApplication::translate("MainWindow", " View Options", 0));
         menuCalls->setTitle(QApplication::translate("MainWindow", "Calls", 0));
         menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0));

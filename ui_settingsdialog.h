@@ -54,16 +54,19 @@ public:
     QLabel *vidLabel;
     QLabel *pidLabel;
     QGroupBox *additionalOptionsGroupBox;
-    QGridLayout *gridLayout_4;
+    QHBoxLayout *horizontalLayout_3;
     QPushButton *searchButton;
     QComboBox *serialPortInfoListBox;
-    QSpacerItem *horizontalSpacer_3;
+    QGroupBox *refreshOption;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *refreshLabel;
+    QComboBox *refreshBox;
 
     void setupUi(QDialog *SettingsDialog)
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
-        SettingsDialog->resize(327, 268);
+        SettingsDialog->resize(354, 268);
         SettingsDialog->setMaximumSize(QSize(16777215, 268));
         gridLayout_3 = new QGridLayout(SettingsDialog);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
@@ -182,12 +185,12 @@ public:
 
         additionalOptionsGroupBox = new QGroupBox(SettingsDialog);
         additionalOptionsGroupBox->setObjectName(QStringLiteral("additionalOptionsGroupBox"));
-        gridLayout_4 = new QGridLayout(additionalOptionsGroupBox);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        horizontalLayout_3 = new QHBoxLayout(additionalOptionsGroupBox);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         searchButton = new QPushButton(additionalOptionsGroupBox);
         searchButton->setObjectName(QStringLiteral("searchButton"));
 
-        gridLayout_4->addWidget(searchButton, 0, 0, 1, 1);
+        horizontalLayout_3->addWidget(searchButton);
 
         serialPortInfoListBox = new QComboBox(additionalOptionsGroupBox);
         serialPortInfoListBox->setObjectName(QStringLiteral("serialPortInfoListBox"));
@@ -199,14 +202,27 @@ public:
         serialPortInfoListBox->setMaximumSize(QSize(73, 22));
         serialPortInfoListBox->setLayoutDirection(Qt::LeftToRight);
 
-        gridLayout_4->addWidget(serialPortInfoListBox, 0, 1, 1, 1);
-
-        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout_4->addItem(horizontalSpacer_3, 0, 2, 1, 1);
+        horizontalLayout_3->addWidget(serialPortInfoListBox);
 
 
-        gridLayout_3->addWidget(additionalOptionsGroupBox, 0, 0, 1, 2);
+        gridLayout_3->addWidget(additionalOptionsGroupBox, 0, 0, 1, 1);
+
+        refreshOption = new QGroupBox(SettingsDialog);
+        refreshOption->setObjectName(QStringLiteral("refreshOption"));
+        horizontalLayout_2 = new QHBoxLayout(refreshOption);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        refreshLabel = new QLabel(refreshOption);
+        refreshLabel->setObjectName(QStringLiteral("refreshLabel"));
+
+        horizontalLayout_2->addWidget(refreshLabel);
+
+        refreshBox = new QComboBox(refreshOption);
+        refreshBox->setObjectName(QStringLiteral("refreshBox"));
+
+        horizontalLayout_2->addWidget(refreshBox);
+
+
+        gridLayout_3->addWidget(refreshOption, 0, 1, 1, 1);
 
         QWidget::setTabOrder(searchButton, serialPortInfoListBox);
         QWidget::setTabOrder(serialPortInfoListBox, baudRateBox);
@@ -242,6 +258,8 @@ public:
         pidLabel->setText(QApplication::translate("SettingsDialog", "Product ID:", 0));
         additionalOptionsGroupBox->setTitle(QApplication::translate("SettingsDialog", "Search Options", 0));
         searchButton->setText(QApplication::translate("SettingsDialog", "Search", 0));
+        refreshOption->setTitle(QApplication::translate("SettingsDialog", "Refresh Options", 0));
+        refreshLabel->setText(QApplication::translate("SettingsDialog", "Interval (sec)", 0));
     } // retranslateUi
 
 };

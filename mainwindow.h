@@ -56,22 +56,26 @@ public:
 private slots:
     void openSerialPort();
     void closeSerialPort();
-    void initTimer();
+    void initTimer(int interval);
     void about();
     void writeData(const QByteArray &data);
-    void initData();
+    void fillDataInfo();
     void readData();
     void clearData();
-    void queryData(QString data);
+    void viewData(QString data);
     void recordData(QString data);
     void processData(QByteArray data);
     void refreshData();
+    void sensorView();
     void handleError(QSerialPort::SerialPortError error);    
 
 private:
     void initActionsConnections();
     void initSerialPort();
     void initTable();
+    void fillSensorInfo();
+    void loadSettings();
+    void saveSettings();
 
 private:
     Ui::MainWindow *ui;
@@ -81,6 +85,7 @@ private:
     Console *console;
     QTimer *timer;
     QString format;
+    QString settingsFile;
     QSqlDatabase db;
 
 };
