@@ -66,7 +66,8 @@ public:
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
-        SettingsDialog->resize(354, 268);
+        SettingsDialog->resize(415, 268);
+        SettingsDialog->setMinimumSize(QSize(415, 268));
         SettingsDialog->setMaximumSize(QSize(16777215, 268));
         gridLayout_3 = new QGridLayout(SettingsDialog);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
@@ -257,9 +258,9 @@ public:
         vidLabel->setText(QApplication::translate("SettingsDialog", "Vendor ID:", 0));
         pidLabel->setText(QApplication::translate("SettingsDialog", "Product ID:", 0));
         additionalOptionsGroupBox->setTitle(QApplication::translate("SettingsDialog", "Search Options", 0));
-        searchButton->setText(QApplication::translate("SettingsDialog", "Search", 0));
+        searchButton->setText(QApplication::translate("SettingsDialog", "Search device", 0));
         refreshOption->setTitle(QApplication::translate("SettingsDialog", "Refresh Options", 0));
-        refreshLabel->setText(QApplication::translate("SettingsDialog", "Interval (sec)", 0));
+        refreshLabel->setText(QApplication::translate("SettingsDialog", "Interval (sec):", 0));
     } // retranslateUi
 
 };

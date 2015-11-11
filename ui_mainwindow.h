@@ -22,6 +22,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
@@ -59,6 +60,11 @@ public:
     QComboBox *sensorBox;
     QCheckBox *sensorCheck;
     QSpacerItem *horizontalSpacer;
+    QWidget *export_2;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *exportButton;
+    QLabel *exportLabel;
+    QSpacerItem *horizontalSpacer_2;
     QMenuBar *menuBar;
     QMenu *menuCalls;
     QMenu *menuTools;
@@ -126,7 +132,7 @@ public:
         actionConsole = new QAction(MainWindow);
         actionConsole->setObjectName(QStringLiteral("actionConsole"));
         QIcon icon6;
-        icon6.addFile(QStringLiteral("images/console.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon6.addFile(QStringLiteral(":/images/console.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionConsole->setIcon(icon6);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
@@ -221,6 +227,27 @@ public:
         horizontalLayout->addItem(horizontalSpacer);
 
         tabWidget->addTab(log, QString());
+        export_2 = new QWidget();
+        export_2->setObjectName(QStringLiteral("export_2"));
+        horizontalLayout_2 = new QHBoxLayout(export_2);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        exportButton = new QPushButton(export_2);
+        exportButton->setObjectName(QStringLiteral("exportButton"));
+
+        horizontalLayout_2->addWidget(exportButton);
+
+        exportLabel = new QLabel(export_2);
+        exportLabel->setObjectName(QStringLiteral("exportLabel"));
+
+        horizontalLayout_2->addWidget(exportLabel);
+
+        horizontalSpacer_2 = new QSpacerItem(259, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_2);
+
+        tabWidget->addTab(export_2, QString());
 
         verticalLayout->addWidget(tabWidget);
 
@@ -313,7 +340,7 @@ public:
         actionClear->setShortcut(QApplication::translate("MainWindow", "Alt+R", 0));
         actionRefresh->setText(QApplication::translate("MainWindow", "&Refresh", 0));
         actionRefresh->setShortcut(QApplication::translate("MainWindow", "Alt+U", 0));
-        actionConsole->setText(QApplication::translate("MainWindow", "Console", 0));
+        actionConsole->setText(QApplication::translate("MainWindow", "&Console", 0));
         actionConsole->setShortcut(QApplication::translate("MainWindow", "Alt+C", 0));
         QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "ID", 0));
@@ -329,7 +356,10 @@ public:
         loglevelTime->setText(QApplication::translate("MainWindow", "Log Level:", 0));
         sensorNumber->setText(QApplication::translate("MainWindow", "Sensor:", 0));
         sensorCheck->setText(QApplication::translate("MainWindow", "All Sensors", 0));
-        tabWidget->setTabText(tabWidget->indexOf(log), QApplication::translate("MainWindow", " View Options", 0));
+        tabWidget->setTabText(tabWidget->indexOf(log), QApplication::translate("MainWindow", "View Options", 0));
+        exportButton->setText(QApplication::translate("MainWindow", "Export", 0));
+        exportLabel->setText(QApplication::translate("MainWindow", "(Export to .csv)", 0));
+        tabWidget->setTabText(tabWidget->indexOf(export_2), QApplication::translate("MainWindow", "Export data", 0));
         menuCalls->setTitle(QApplication::translate("MainWindow", "Calls", 0));
         menuTools->setTitle(QApplication::translate("MainWindow", "Tools", 0));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0));

@@ -7,5 +7,6 @@
         <file>images/settings.png</file>
         <file>images/clear.png</file>
         <file>images/console.png</file>
+        <file>lang/com-monitor_ru.qm</file>
     </qresource>
 </RCC>

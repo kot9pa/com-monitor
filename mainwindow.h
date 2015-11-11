@@ -65,6 +65,7 @@ private slots:
     void viewData(QString data);
     void recordData(QString data);
     void processData(QByteArray data);
+    void exportData();
     void refreshData();
     void sensorView();
     void handleError(QSerialPort::SerialPortError error);    

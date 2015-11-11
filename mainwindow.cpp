@@ -110,6 +110,7 @@ void MainWindow::initActionsConnections()
     connect(ui->sensorBox, SIGNAL(activated(int)), this, SLOT(fillDataInfo()));
     connect(ui->dateTimeEdit, SIGNAL(dateChanged(QDate)), this, SLOT(fillDataInfo()));
     connect(ui->logLevelBox, SIGNAL(activated(int)), this, SLOT(fillDataInfo()));
+    connect(ui->exportButton, SIGNAL(pressed()), this, SLOT(exportData()));
     connect(ui->actionConnect, SIGNAL(triggered()), this, SLOT(openSerialPort()));
     connect(ui->actionDisconnect, SIGNAL(triggered()), this, SLOT(closeSerialPort()));
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
@@ -152,13 +153,13 @@ void MainWindow::openSerialPort()
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
-    if (serial->open(QIODevice::ReadWrite)) {
-            initTimer(p.refresh);
-            //console->putData("Connected to "+ p.name);
+    if (serial->open(QIODevice::ReadWrite)) {            
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
             ui->actionConfigure->setEnabled(false);
             ui->actionRefresh->setEnabled(true);
+            initTimer(p.refresh);
+            console->putData("Connected\n");
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
@@ -166,7 +167,7 @@ void MainWindow::openSerialPort()
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());        
         ui->statusBar->showMessage(tr("Open error"));        
-        //console->putData("Error opened port");
+        console->putData("Error opened port\n");
 
     }
 }
@@ -180,7 +181,7 @@ void MainWindow::closeSerialPort()
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
     ui->statusBar->showMessage(tr("Disconnected"));    
-    //console->putData("Disconnected");
+    console->putData("Disconnected\n");
     timer->stop();
 
 }
@@ -226,7 +227,6 @@ void MainWindow::processData(QByteArray data)
     qDebug()<<"message = " << data.mid(47, 23);
     query.exec();
 
-    //fillSensorInfo();
     fillDataInfo();
 }
 
@@ -301,8 +301,7 @@ void MainWindow::fillSensorInfo()
 
 void MainWindow::sensorView()
 {
-    ui->sensorBox->setDisabled(ui->sensorCheck->isChecked());
-    //fillSensorInfo();
+    ui->sensorBox->setDisabled(ui->sensorCheck->isChecked());    
     fillDataInfo();
 
 }
@@ -373,6 +372,29 @@ void MainWindow::recordData(QString data)
     {
         qWarning("Can not open file.");
     }
+}
+
+void MainWindow::exportData()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Export to:", "com-monitor.csv",
+                                                    "CSV files (.csv);", 0, 0);
+    QFile file(filename);
+    if(file.open(QFile::WriteOnly |QFile::Truncate)) {
+        QTextStream output(&file);
+        QStringList strList;
+        //strList <<"\" " +ui->tableWidget->horizontalHeaderItem(0)->data(Qt::DisplayRole).toString() +"\" ";
+
+        for( int r = 0; r < ui->tableWidget->rowCount(); ++r ) {
+            strList.clear();
+            for( int c = 0; c < ui->tableWidget->columnCount(); ++c ) {
+                strList << "\" "+ui->tableWidget->item( r, c )->text()+"\" ";
+            }
+            output << strList.join( ";" )+"\n";
+        }
+        file.close();
+
+    }
+
 }
 
 void MainWindow::handleError(QSerialPort::SerialPortError error)

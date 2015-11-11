@@ -27,10 +27,15 @@
 
 #include "mainwindow.h"
 #include <QApplication>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    /*QTranslator translator;
+    translator.load("com-monitor_ru",":lang/");
+    //if (lang == 'English') translator.load('com-monitor_en','lang:/');
+    a.installTranslator(&translator);*/
     MainWindow w;
     w.show();
 

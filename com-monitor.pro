@@ -28,11 +28,7 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     com-monitor.qrc
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../qt/5.5/Src/led-designer-plugin/release/ -lled-designer-plugin
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../qt/5.5/Src/led-designer-plugin/debug/ -lled-designer-plugin
-else:unix: LIBS += -L$$PWD/../../qt/5.5/Src/led-designer-plugin/ -lled-designer-plugin
-
-INCLUDEPATH += $$PWD/../../qt/5.5/Src/led-designer-plugin/release
-DEPENDPATH += $$PWD/../../qt/5.5/Src/led-designer-plugin/release
+TRANSLATIONS += \
+    com-monitor_ru.ts
 
 DISTFILES +=

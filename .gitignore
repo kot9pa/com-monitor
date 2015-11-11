@@ -4,5 +4,7 @@
 Makefile
 debug
 release
+install
 *.log
 *.sqlite
+*.csv

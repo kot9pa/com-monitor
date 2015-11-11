@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>354</width>
+    <width>415</width>
     <height>268</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>415</width>
+    <height>268</height>
+   </size>
   </property>
   <property name="maximumSize">
    <size>
@@ -170,7 +176,7 @@
       <item>
        <widget class="QPushButton" name="searchButton">
         <property name="text">
-         <string>Search</string>
+         <string>Search device</string>
         </property>
        </widget>
       </item>
@@ -205,7 +211,7 @@
       <item>
        <widget class="QLabel" name="refreshLabel">
         <property name="text">
-         <string>Interval (sec)</string>
+         <string>Interval (sec):</string>
         </property>
        </widget>
       </item>
