@@ -302,6 +302,7 @@ public:
         retranslateUi(MainWindow);
         QObject::connect(actionToolBar, SIGNAL(toggled(bool)), mainToolBar, SLOT(setVisible(bool)));
         QObject::connect(actionStatusBar, SIGNAL(toggled(bool)), statusBar, SLOT(setVisible(bool)));
+        QObject::connect(sensorCheck, SIGNAL(toggled(bool)), sensorBox, SLOT(setDisabled(bool)));
 
         tabWidget->setCurrentIndex(0);
 

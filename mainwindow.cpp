@@ -35,6 +35,8 @@
 #include <QFile>
 #include <QTimer>
 #include <QFileDialog>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentMap>
 #include <QSettings>
 
 #include <QDebug>
@@ -45,10 +47,25 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    qRegisterMetaType<QVector<int> >("QVector<int>");
+
     console = new Console;
     serial = new QSerialPort(this);
     settings = new SettingsDialog;
-    timer = new QTimer(this);    
+    refresh = new QTimer(this);
+
+    progressBar = new QProgressBar(ui->statusBar);
+    progressBar->setAlignment(Qt::AlignRight);
+    progressBar->setFixedHeight(15);
+    progressBar->setFixedWidth(150);
+    //progressBar->setRange(0,100);
+    progressBar->setValue(0);
+    progressBar->setTextVisible(true);
+    progressBar->setMinimum(0);
+    //progressBar->setMaximum(100);
+    progressBar->hide();
+
+    ui->statusBar->addPermanentWidget(progressBar);
 
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
@@ -73,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initActionsConnections();
     initSerialPort();
     initTable();
-    fillSensorInfo();
+
     fillDataInfo();
 
 }
@@ -91,8 +108,8 @@ MainWindow::~MainWindow()
 void MainWindow::initTimer(int interval)
 {    
     if (serial->isOpen() && interval!=0) {
-    timer->setInterval(interval*1000);
-    timer->start();
+    refresh->setInterval(interval*1000);
+    refresh->start();
     }
 }
 
@@ -105,8 +122,8 @@ void MainWindow::initSerialPort()
 void MainWindow::initActionsConnections()
 {
     connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
-    connect(timer, SIGNAL(timeout()), this, SLOT(refreshData()));
-    connect(ui->sensorCheck, SIGNAL(toggled(bool)), this, SLOT(sensorView()));
+    connect(refresh, SIGNAL(timeout()), this, SLOT(refreshData()));
+    connect(ui->sensorCheck, SIGNAL(toggled(bool)), this, SLOT(fillDataInfo()));
     connect(ui->sensorBox, SIGNAL(activated(int)), this, SLOT(fillDataInfo()));
     connect(ui->dateTimeEdit, SIGNAL(dateChanged(QDate)), this, SLOT(fillDataInfo()));
     connect(ui->logLevelBox, SIGNAL(activated(int)), this, SLOT(fillDataInfo()));
@@ -119,29 +136,39 @@ void MainWindow::initActionsConnections()
     connect(ui->actionClear, SIGNAL(triggered()), this, SLOT(clearData()));
     connect(ui->actionConsole, SIGNAL(triggered()), console, SLOT(show()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(ui->actionRefresh, SIGNAL(triggered()), this, SLOT(refreshData()));
+    connect(ui->actionRefresh, SIGNAL(triggered()), this, SLOT(refreshData()));    
 
 }
 
 void MainWindow::initTable()
 {
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("com-monitor.sqlite");
-    if (!db.open()) {
-        QMessageBox::critical(0, qApp->tr("Cannot open database"),
-        qApp->tr("Unable to establish a database connection.\n"
-                 "This example needs SQLite support. Please read "
-                 "the Qt SQL driver documentation for information how "
-                 "to build it.\n\n"
-                 "Click Cancel to exit."), QMessageBox::Cancel);
+    if(db.databaseName().isEmpty()) {
+        QString path = QFileDialog::getSaveFileName(this, tr("Data file:"),
+                                                    QApplication::applicationDirPath()+"/com-monitor.sqlite",
+                                                    "SQLite files (*.sqlite)");
+        db.setDatabaseName(path);
     }
-    QSqlQuery query("CREATE TABLE tabMain ("
-           "id INTEGER primary key, "
-           "datetime DATETIME, "
-           "sensor INTEGER, "
-           "status INTEGER, "
-           "message VARCHAR(255)"
-           ")");
+    if(db.open()) {
+        QSqlQuery query;
+        query.exec("CREATE TABLE tabMain ("
+               "id INTEGER primary key, "
+               "datetime DATETIME, "
+               "sensor INTEGER, "
+               "status INTEGER, "
+               "message VARCHAR(255)"
+               ")");
+    } else QMessageBox::critical(0, qApp->tr("Cannot open database"),
+           qApp->tr("Unable to establish a database connection.\n"
+           "This example needs SQLite support. Please read "
+           "the Qt SQL driver documentation for information how "
+           "to build it.\n\n"
+           "Click Cancel to exit."), QMessageBox::Cancel);
+
+    console->putData(db.lastError().text());
+
+    //qDebug()<<db.lastError().text();
+    qDebug()<<"db = "<<db.databaseName();
+
 }
 
 void MainWindow::openSerialPort()
@@ -159,7 +186,7 @@ void MainWindow::openSerialPort()
             ui->actionConfigure->setEnabled(false);
             ui->actionRefresh->setEnabled(true);
             initTimer(p.refresh);
-            console->putData("Connected\n");
+            console->putData("Connected");
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
@@ -167,7 +194,7 @@ void MainWindow::openSerialPort()
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());        
         ui->statusBar->showMessage(tr("Open error"));        
-        console->putData("Error opened port\n");
+        console->putData("Error opened port");
 
     }
 }
@@ -181,8 +208,8 @@ void MainWindow::closeSerialPort()
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
     ui->statusBar->showMessage(tr("Disconnected"));    
-    console->putData("Disconnected\n");
-    timer->stop();
+    console->putData("Disconnected");
+    refresh->stop();
 
 }
 
@@ -197,13 +224,24 @@ void MainWindow::readData()
 {
     serial->waitForReadyRead(500);
 
-    QByteArray byte = serial->readAll();
-    console->putData(byte);
+    QByteArray bytes = serial->readAll();
+    console->putData(bytes);
 
-    qDebug()<<"read = " << byte;
+    qDebug()<<"read = " << bytes;
 
     QByteArray dataArray(65536, 0);
-    dataArray.insert(0, byte);
+    dataArray.insert(0, bytes);
+
+    QBitArray bits(bytes.count()*8);
+
+    // Convert from QByteArray to QBitArray
+    for(int i=0; i<bytes.count(); ++i) {
+        for(int b=0; b<8; ++b) {
+            bits.setBit( i*8+b, bytes.at(i)&(1<<(7-b)) );
+        }
+    }
+
+    //qDebug()<<bytes<<" = "<<bits;
 
     if(dataArray.at(0)=='\r' && dataArray.at(1)=='\n') {
         processData(dataArray);
@@ -225,13 +263,14 @@ void MainWindow::processData(QByteArray data)
     qDebug()<<"status = " << data.mid(44, 1);
     query.bindValue(":message", data.mid(47, 23));
     qDebug()<<"message = " << data.mid(47, 23);
-    query.exec();
+    query.exec();    
 
     fillDataInfo();
 }
 
 void MainWindow::fillDataInfo()
-{    
+{
+
     int level = ui->logLevelBox->currentIndex();
     QString date = ui->dateTimeEdit->date().toString("yyyy-MM-dd");
     QString sensor;
@@ -281,10 +320,10 @@ void MainWindow::fillDataInfo()
 
 void MainWindow::fillSensorInfo()
 {
-    QStringList list;
-    QSqlQuery query;
+    QStringList list;    
     QString last = ui->sensorBox->currentText();
     QString date = ui->dateTimeEdit->date().toString("yyyy-MM-dd");
+    QSqlQuery query;
     query.prepare(QString("SELECT DISTINCT sensor FROM tabMain WHERE date(datetime) = '%1'").arg(date));
     query.exec();
     qDebug()<<query.lastQuery();
@@ -299,25 +338,26 @@ void MainWindow::fillSensorInfo()
 
 }
 
-void MainWindow::sensorView()
-{
-    ui->sensorBox->setDisabled(ui->sensorCheck->isChecked());    
-    fillDataInfo();
-
-}
-
 void MainWindow::viewData(QString data)
 {
+    int i = 0;
     int n = ui->tableWidget->rowCount();
     for( int i = 0; i < n; i++ ) ui->tableWidget->removeRow( 0 );
 
-    QSqlQuery query(data);
+    QSqlQuery query;
+    query.prepare(QString("SELECT COUNT(*) FROM (%1) AS subquery").arg(data));
     query.exec();
+    query.next();
+    QSqlRecord recordCount;
+    recordCount = query.record();
+    //int qSize = query.value(recordCount.indexOf("subquery")).toInt();
+    int qSize = query.value(0).toInt();
+    qDebug()<<"count = "<<qSize;
 
-    //qDebug()<<query.isValid();
-    //qDebug()<<query.lastError();
-    qDebug()<<query.lastQuery();
+    progressBar->setMaximum(qSize);
+    progressBar->show();
 
+    query.exec(data);
     while (query.next())
     {
         ui->tableWidget->insertRow(0);
@@ -327,6 +367,8 @@ void MainWindow::viewData(QString data)
         ui->tableWidget->setItem(0, 2, new QTableWidgetItem(query.value(2).toString()));
         ui->tableWidget->setItem(0, 3, new QTableWidgetItem(query.value(3).toString()));
         ui->tableWidget->setItem(0, 4, new QTableWidgetItem(query.value(4).toString()));
+
+        progressBar->setValue(++i);
 
         QString status = query.value(3).toString();
 
@@ -339,6 +381,14 @@ void MainWindow::viewData(QString data)
         else for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::green);
 
     }
+
+    //qDebug()<<query.isValid();
+    //qDebug()<<query.lastError();
+    //qDebug()<<query.lastQuery();
+    console->putData(query.lastQuery());
+
+    progressBar->reset();
+    progressBar->hide();
 
 }
 
@@ -376,8 +426,8 @@ void MainWindow::recordData(QString data)
 
 void MainWindow::exportData()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Export to:", "com-monitor.csv",
-                                                    "CSV files (.csv);", 0, 0);
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export to:"), "com-monitor.csv",
+                                                    "CSV files (*.csv)", 0, 0);
     QFile file(filename);
     if(file.open(QFile::WriteOnly |QFile::Truncate)) {
         QTextStream output(&file);
@@ -407,26 +457,30 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
 
 void MainWindow::saveSettings()
 {
- QSettings settings(settingsFile, QSettings::IniFormat);
+    QSettings settings(settingsFile, QSettings::IniFormat);
 
- qDebug()<<"settingsFile2"<<settingsFile;
+    qDebug()<<"settingsFile2"<<settingsFile;
 
     settings.setValue("LogLevel", ui->logLevelBox->currentText());
     settings.setValue("LogLevelIndex", ui->logLevelBox->currentIndex());
     settings.setValue("Sensor", ui->sensorBox->currentText());
     settings.setValue("SensorCheckAll", ui->sensorCheck->isChecked());
+    settings.setValue("DataBaseName", db.databaseName());
 
 }
 
 void MainWindow::loadSettings()
 {
- QSettings settings(settingsFile, QSettings::IniFormat);
+    QSettings settings(settingsFile, QSettings::IniFormat);
 
     ui->logLevelBox->setCurrentText(settings.value("LogLevel").toString());
     ui->logLevelBox->setCurrentIndex(settings.value("LogLevelIndex").toInt());
     ui->sensorBox->setCurrentText(settings.value("Sensor").toString());
     ui->sensorBox->setDisabled(settings.value("SensorCheckAll").toBool());
     ui->sensorCheck->setChecked(settings.value("SensorCheckAll").toBool());
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(settings.value("DataBaseName").toString());
 
 }
 

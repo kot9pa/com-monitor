@@ -32,7 +32,8 @@
 #include <QMainWindow>
 #include <QtSerialPort/QSerialPort>
 #include <QtSql>
-//#include <QTableWidget>
+#include <QProgressBar>
+#include <QFutureWatcher>
 
 QT_BEGIN_NAMESPACE
 
@@ -67,10 +68,9 @@ private slots:
     void processData(QByteArray data);
     void exportData();
     void refreshData();
-    void sensorView();
     void handleError(QSerialPort::SerialPortError error);    
 
-private:
+private:    
     void initActionsConnections();
     void initSerialPort();
     void initTable();
@@ -80,11 +80,11 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    //QTableWidget *tableWidget;
+    QProgressBar *progressBar;
     SettingsDialog *settings;
     QSerialPort *serial;
     Console *console;
-    QTimer *timer;
+    QTimer *refresh;
     QString format;
     QString settingsFile;
     QSqlDatabase db;

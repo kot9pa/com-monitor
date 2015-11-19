@@ -61,18 +61,18 @@ Console::~Console()
     delete ui;
 }
 
-void Console::putData(const QByteArray &data)
+void Console::putData(QByteArray &data)
 {
-    insertPlainText(QString(data));
+    insertPlainText(QString(data));    
     qDebug()<<"data = "<<data;
 
     QScrollBar *bar = verticalScrollBar();
     bar->setValue(bar->maximum());
 }
 
-void Console::putData(QString &data)
+void Console::putData(QString data)
 {
-    insertPlainText(data);
+    insertPlainText(data+"\r");
     qDebug()<<"data = "<<data;
 
     QScrollBar *bar = verticalScrollBar();

@@ -58,8 +58,8 @@ public:
     explicit Console(QWidget *parent = 0);
     ~Console();
 
-    void putData(const QByteArray &data);
-    void putData(QString &data);
+    void putData(QByteArray &data);
+    void putData(QString data);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *e);
