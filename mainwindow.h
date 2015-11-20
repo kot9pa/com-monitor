@@ -54,20 +54,23 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+    void writeRequest(const QByteArray &data);
+
 private slots:
     void openSerialPort();
     void closeSerialPort();
-    void initTimer(int interval);
+    void initTimer();
     void about();
     void writeData(const QByteArray &data);
     void fillDataInfo();
     void readData();
     void clearData();
     void viewData(QString data);
-    void recordData(QString data);
-    void processData(QByteArray data);
-    void exportData();
+    void recordData();
     void refreshData();
+    void processData();
+    void exportData();
     void handleError(QSerialPort::SerialPortError error);    
 
 private:    
@@ -85,6 +88,8 @@ private:
     QSerialPort *serial;
     Console *console;
     QTimer *refresh;
+    QByteArray bytes;
+    QByteArray msg;
     QString format;
     QString settingsFile;
     QSqlDatabase db;

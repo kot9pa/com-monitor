@@ -24,6 +24,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
@@ -54,11 +55,13 @@ public:
     QWidget *log;
     QHBoxLayout *horizontalLayout;
     QDateTimeEdit *dateTimeEdit;
-    QLabel *loglevelTime;
+    QLabel *loglevelLabel;
     QComboBox *logLevelBox;
-    QLabel *sensorNumber;
+    QLabel *sensorLabel;
     QComboBox *sensorBox;
     QCheckBox *sensorCheck;
+    QSpinBox *rowCount;
+    QLabel *rowCountLabel;
     QSpacerItem *horizontalSpacer;
     QWidget *export_2;
     QHBoxLayout *horizontalLayout_2;
@@ -78,13 +81,13 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->setWindowModality(Qt::NonModal);
-        MainWindow->resize(451, 493);
+        MainWindow->resize(563, 499);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
         MainWindow->setSizePolicy(sizePolicy);
-        MainWindow->setMinimumSize(QSize(451, 493));
+        MainWindow->setMinimumSize(QSize(563, 499));
         MainWindow->setMaximumSize(QSize(16777215, 16777215));
         MainWindow->setCursor(QCursor(Qt::ArrowCursor));
         MainWindow->setContextMenuPolicy(Qt::DefaultContextMenu);
@@ -161,7 +164,7 @@ public:
         tableWidget->setHorizontalHeaderItem(4, __qtablewidgetitem4);
         tableWidget->setObjectName(QStringLiteral("tableWidget"));
         tableWidget->setMinimumSize(QSize(441, 341));
-        tableWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+        tableWidget->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
         tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
         tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -194,10 +197,10 @@ public:
 
         horizontalLayout->addWidget(dateTimeEdit);
 
-        loglevelTime = new QLabel(log);
-        loglevelTime->setObjectName(QStringLiteral("loglevelTime"));
+        loglevelLabel = new QLabel(log);
+        loglevelLabel->setObjectName(QStringLiteral("loglevelLabel"));
 
-        horizontalLayout->addWidget(loglevelTime);
+        horizontalLayout->addWidget(loglevelLabel);
 
         logLevelBox = new QComboBox(log);
         logLevelBox->setObjectName(QStringLiteral("logLevelBox"));
@@ -205,10 +208,10 @@ public:
 
         horizontalLayout->addWidget(logLevelBox);
 
-        sensorNumber = new QLabel(log);
-        sensorNumber->setObjectName(QStringLiteral("sensorNumber"));
+        sensorLabel = new QLabel(log);
+        sensorLabel->setObjectName(QStringLiteral("sensorLabel"));
 
-        horizontalLayout->addWidget(sensorNumber);
+        horizontalLayout->addWidget(sensorLabel);
 
         sensorBox = new QComboBox(log);
         sensorBox->setObjectName(QStringLiteral("sensorBox"));
@@ -221,6 +224,18 @@ public:
         sensorCheck->setObjectName(QStringLiteral("sensorCheck"));
 
         horizontalLayout->addWidget(sensorCheck);
+
+        rowCount = new QSpinBox(log);
+        rowCount->setObjectName(QStringLiteral("rowCount"));
+        rowCount->setMaximum(9999);
+        rowCount->setValue(100);
+
+        horizontalLayout->addWidget(rowCount);
+
+        rowCountLabel = new QLabel(log);
+        rowCountLabel->setObjectName(QStringLiteral("rowCountLabel"));
+
+        horizontalLayout->addWidget(rowCountLabel);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -257,7 +272,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 451, 21));
+        menuBar->setGeometry(QRect(0, 0, 563, 21));
         menuCalls = new QMenu(menuBar);
         menuCalls->setObjectName(QStringLiteral("menuCalls"));
         menuTools = new QMenu(menuBar);
@@ -354,9 +369,10 @@ public:
         QTableWidgetItem *___qtablewidgetitem4 = tableWidget->horizontalHeaderItem(4);
         ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Message", 0));
         dateTimeEdit->setDisplayFormat(QApplication::translate("MainWindow", "dd.MM.yyyy", 0));
-        loglevelTime->setText(QApplication::translate("MainWindow", "Log Level:", 0));
-        sensorNumber->setText(QApplication::translate("MainWindow", "Sensor:", 0));
+        loglevelLabel->setText(QApplication::translate("MainWindow", "Log Level:", 0));
+        sensorLabel->setText(QApplication::translate("MainWindow", "Sensor:", 0));
         sensorCheck->setText(QApplication::translate("MainWindow", "All Sensors", 0));
+        rowCountLabel->setText(QApplication::translate("MainWindow", "Row Count", 0));
         tabWidget->setTabText(tabWidget->indexOf(log), QApplication::translate("MainWindow", "View Options", 0));
         exportButton->setText(QApplication::translate("MainWindow", "Export", 0));
         exportLabel->setText(QApplication::translate("MainWindow", "(Export to .csv)", 0));

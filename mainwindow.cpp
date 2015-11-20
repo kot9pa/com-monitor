@@ -35,8 +35,6 @@
 #include <QFile>
 #include <QTimer>
 #include <QFileDialog>
-#include <QtConcurrent/QtConcurrent>
-#include <QtConcurrent/QtConcurrentMap>
 #include <QSettings>
 
 #include <QDebug>
@@ -53,16 +51,15 @@ MainWindow::MainWindow(QWidget *parent) :
     serial = new QSerialPort(this);
     settings = new SettingsDialog;
     refresh = new QTimer(this);
+    refresh->setSingleShot(true);
 
     progressBar = new QProgressBar(ui->statusBar);
     progressBar->setAlignment(Qt::AlignRight);
     progressBar->setFixedHeight(15);
-    progressBar->setFixedWidth(150);
-    //progressBar->setRange(0,100);
+    progressBar->setFixedWidth(150);    
     progressBar->setValue(0);
-    progressBar->setTextVisible(true);
     progressBar->setMinimum(0);
-    //progressBar->setMaximum(100);
+    progressBar->setTextVisible(true);        
     progressBar->hide();
 
     ui->statusBar->addPermanentWidget(progressBar);
@@ -80,9 +77,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tableWidget->setColumnHidden(0, true);
     ui->dateTimeEdit->setDate(QDate::currentDate());
+    ui->sensorCheck->setChecked(true);
 
+    msg = ("AT^MONP\r");
+    bytes = QByteArray(65536, 0);
     format = ("dd.MM.yy HH:mm:ss");
-
     settingsFile = QApplication::applicationDirPath() + "/com-monitor.ini";
 
     loadSettings();
@@ -105,12 +104,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initTimer(int interval)
-{    
+void MainWindow::initTimer()
+{
+    int interval = refresh->interval();
     if (serial->isOpen() && interval!=0) {
-    refresh->setInterval(interval*1000);
-    refresh->start();
+        refresh->setInterval(interval);
+        refresh->start();
     }
+
+    qDebug()<<"interval = "<<refresh->interval();
+
 }
 
 void MainWindow::initSerialPort()
@@ -121,6 +124,7 @@ void MainWindow::initSerialPort()
 
 void MainWindow::initActionsConnections()
 {
+    connect(this, SIGNAL(writeRequest(QByteArray)), this, SLOT(writeData(QByteArray)));
     connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
     connect(refresh, SIGNAL(timeout()), this, SLOT(refreshData()));
     connect(ui->sensorCheck, SIGNAL(toggled(bool)), this, SLOT(fillDataInfo()));
@@ -133,10 +137,11 @@ void MainWindow::initActionsConnections()
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionConfigure, SIGNAL(triggered()), settings, SLOT(show()));
     connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
-    connect(ui->actionClear, SIGNAL(triggered()), this, SLOT(clearData()));
+    //connect(ui->actionClear, SIGNAL(triggered()), this, SLOT(clearData()));
     connect(ui->actionConsole, SIGNAL(triggered()), console, SLOT(show()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    connect(ui->actionRefresh, SIGNAL(triggered()), this, SLOT(refreshData()));    
+    connect(ui->actionRefresh, SIGNAL(triggered()), this, SLOT(refreshData()));
+    connect(ui->rowCount, SIGNAL(editingFinished()), this, SLOT(processData()));
 
 }
 
@@ -166,7 +171,6 @@ void MainWindow::initTable()
 
     console->putData(db.lastError().text());
 
-    //qDebug()<<db.lastError().text();
     qDebug()<<"db = "<<db.databaseName();
 
 }
@@ -180,23 +184,24 @@ void MainWindow::openSerialPort()
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
+    serial->setReadBufferSize(65536);
     if (serial->open(QIODevice::ReadWrite)) {            
             ui->actionConnect->setEnabled(false);
             ui->actionDisconnect->setEnabled(true);
             ui->actionConfigure->setEnabled(false);
             ui->actionRefresh->setEnabled(true);
-            initTimer(p.refresh);
-            console->putData("Connected");
+            refresh->setInterval(p.refresh*1000);
             ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                                        .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                                        .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
 
     } else {
         QMessageBox::critical(this, tr("Error"), serial->errorString());        
-        ui->statusBar->showMessage(tr("Open error"));        
-        console->putData("Error opened port");
+        ui->statusBar->showMessage(tr("Open error"));
 
     }
+
+    console->putData(ui->statusBar->currentMessage());
 }
 
 void MainWindow::closeSerialPort()
@@ -207,8 +212,10 @@ void MainWindow::closeSerialPort()
     ui->actionDisconnect->setEnabled(false);
     ui->actionConfigure->setEnabled(true);
     ui->actionRefresh->setEnabled(false);
-    ui->statusBar->showMessage(tr("Disconnected"));    
-    console->putData("Disconnected");
+    ui->statusBar->showMessage(tr("Disconnected"));
+
+    console->putData(ui->statusBar->currentMessage());
+
     refresh->stop();
 
 }
@@ -218,19 +225,39 @@ void MainWindow::writeData(const QByteArray &data)
     serial->write(data);
     qDebug()<<"write = " << data;
 
+    bytes.clear();
+
+}
+
+void MainWindow::refreshData()
+{
+    if(!bytes.isEmpty())
+        processData();
+
+    if(serial->isOpen())
+        emit writeRequest(msg);
+
+    initTimer();
+
+    //bytes.clear();
+
 }
 
 void MainWindow::readData()
 {
-    serial->waitForReadyRead(500);
+    //serial->waitForReadyRead(500);
 
-    QByteArray bytes = serial->readAll();
+    bytes.append(serial->readAll());
+
     console->putData(bytes);
 
     qDebug()<<"read = " << bytes;
 
-    QByteArray dataArray(65536, 0);
-    dataArray.insert(0, bytes);
+}
+
+void MainWindow::processData()
+{
+    //console->putData(bytes);
 
     QBitArray bits(bytes.count()*8);
 
@@ -241,36 +268,35 @@ void MainWindow::readData()
         }
     }
 
-    //qDebug()<<bytes<<" = "<<bits;
+    //qDebug()<<bits;
 
-    if(dataArray.at(0)=='\r' && dataArray.at(1)=='\n') {
-        processData(dataArray);
-        recordData(dataArray);
-        }
-    dataArray = 0;
+    if(bytes.at(0)=='\r' && bytes.at(1)=='\n') {
 
-}
+        QSqlQuery query;
+        query.prepare("INSERT INTO tabMain (id, datetime, sensor, status, message) "
+                      "VALUES (null , :datetime, :sensor, :status, :message)");
+        query.bindValue(":datetime", QDateTime::currentDateTime());
+        query.bindValue(":sensor", bytes.mid(39, 2).toInt());
+        qDebug()<<"sensor = " << bytes.mid(39, 2);
+        query.bindValue(":status", bytes.mid(44, 1).toInt());
+        qDebug()<<"status = " << bytes.mid(44, 1);
+        query.bindValue(":message", bytes.mid(47, 23));
+        qDebug()<<"message = " << bytes.mid(47, 23);
+        query.exec();
 
-void MainWindow::processData(QByteArray data)
-{
-    QSqlQuery query;
-    query.prepare("INSERT INTO tabMain (id, datetime, sensor, status, message) "
-                  "VALUES (null , :datetime, :sensor, :status, :message)");
-    query.bindValue(":datetime", QDateTime::currentDateTime());
-    query.bindValue(":sensor", data.mid(39, 2).toInt());
-    qDebug()<<"sensor = " << data.mid(39, 2);
-    query.bindValue(":status", data.mid(44, 1).toInt());
-    qDebug()<<"status = " << data.mid(44, 1);
-    query.bindValue(":message", data.mid(47, 23));
-    qDebug()<<"message = " << data.mid(47, 23);
-    query.exec();    
+        recordData();
+
+    }
 
     fillDataInfo();
+
+    //bytes.clear();
+
 }
 
 void MainWindow::fillDataInfo()
 {
-
+    int limit = ui->rowCount->value();
     int level = ui->logLevelBox->currentIndex();
     QString date = ui->dateTimeEdit->date().toString("yyyy-MM-dd");
     QString sensor;
@@ -292,25 +318,29 @@ void MainWindow::fillDataInfo()
     switch (level) {
     case 0:
         data = "SELECT * FROM tabMain "
-               "WHERE date(datetime) = '%1' AND sensor IN (%2)"; //ALL
-        viewData(data.arg(date).arg(sensor));
+               "WHERE date(datetime) = '%1' AND sensor IN (%2) "
+               "ORDER BY datetime LIMIT %3"; //ALL
+        viewData(data.arg(date).arg(sensor).arg(limit));
         break;
 
     case 1:
         data = "SELECT * FROM tabMain WHERE status NOT IN (6,7,8,9) "
-               "AND date(datetime) = '%1' AND sensor IN (%2)"; //INFO
+               "AND date(datetime) = '%1' AND sensor IN (%2) "
+               "ORDER BY datetime"; //INFO
         viewData(data.arg(date).arg(sensor));
         break;
 
     case 2:
         data = "SELECT * FROM tabMain WHERE status IN (8,9) "
-               "AND date(datetime) = '%1' AND sensor IN (%2)"; //WARNING
+               "AND date(datetime) = '%1' AND sensor IN (%2) "
+               "ORDER BY datetime"; //WARNING
         viewData(data.arg(date).arg(sensor));
         break;
 
     case 3:
         data = "SELECT * FROM tabMain WHERE status IN (6,7) "
-               "AND date(datetime) = '%1' AND sensor IN (%2)"; //ERROR
+               "AND date(datetime) = '%1' AND sensor IN (%2) "
+               "ORDER BY datetime"; //ERROR
         viewData(data.arg(date).arg(sensor));
         break;
 
@@ -326,11 +356,11 @@ void MainWindow::fillSensorInfo()
     QSqlQuery query;
     query.prepare(QString("SELECT DISTINCT sensor FROM tabMain WHERE date(datetime) = '%1'").arg(date));
     query.exec();
-    qDebug()<<query.lastQuery();
     while(query.next()) {
         list.append(query.value(0).toString());
 
     }
+
     ui->sensorBox->clear();
     ui->sensorBox->addItems(list);
     ui->sensorBox->addItem(tr("All"), list.join(", "));
@@ -340,7 +370,7 @@ void MainWindow::fillSensorInfo()
 
 void MainWindow::viewData(QString data)
 {
-    int i = 0;
+    int value = 0;    
     int n = ui->tableWidget->rowCount();
     for( int i = 0; i < n; i++ ) ui->tableWidget->removeRow( 0 );
 
@@ -349,14 +379,15 @@ void MainWindow::viewData(QString data)
     query.exec();
     query.next();
     QSqlRecord recordCount;
-    recordCount = query.record();
-    //int qSize = query.value(recordCount.indexOf("subquery")).toInt();
+    recordCount = query.record();    
     int qSize = query.value(0).toInt();
+
     qDebug()<<"count = "<<qSize;
 
     progressBar->setMaximum(qSize);
     progressBar->show();
 
+    //query.prepare(QString("SELECT TOP %2 FROM (%1)").arg(data).arg(limit));
     query.exec(data);
     while (query.next())
     {
@@ -368,7 +399,7 @@ void MainWindow::viewData(QString data)
         ui->tableWidget->setItem(0, 3, new QTableWidgetItem(query.value(3).toString()));
         ui->tableWidget->setItem(0, 4, new QTableWidgetItem(query.value(4).toString()));
 
-        progressBar->setValue(++i);
+        progressBar->setValue(++value);
 
         QString status = query.value(3).toString();
 
@@ -384,8 +415,7 @@ void MainWindow::viewData(QString data)
 
     //qDebug()<<query.isValid();
     //qDebug()<<query.lastError();
-    //qDebug()<<query.lastQuery();
-    console->putData(query.lastQuery());
+    qDebug()<<query.lastQuery();
 
     progressBar->reset();
     progressBar->hide();
@@ -400,22 +430,15 @@ void MainWindow::clearData()
     fillDataInfo();
 }
 
-void MainWindow::refreshData()
-{
-    if (serial->isOpen())
-        writeData("AT^MONP\r");
-
-}
-
-void MainWindow::recordData(QString data)
+void MainWindow::recordData()
 {
     QString date = QDateTime::currentDateTime().toString(format);
     QFile file("com-monitor.log");
     if (file.open(QIODevice::Append | QIODevice::Text))
     {
         QTextStream out(&file);
-        out << date << endl << data << endl;
-        qDebug()<< "record = " << data;
+        out << date << endl << bytes << endl;
+        qDebug()<< "record = " << bytes;
         file.close();
     }
     else
@@ -426,6 +449,9 @@ void MainWindow::recordData(QString data)
 
 void MainWindow::exportData()
 {
+    progressBar->show();
+    progressBar->setMaximum(ui->tableWidget->rowCount());
+
     QString filename = QFileDialog::getSaveFileName(this, tr("Export to:"), "com-monitor.csv",
                                                     "CSV files (*.csv)", 0, 0);
     QFile file(filename);
@@ -435,6 +461,8 @@ void MainWindow::exportData()
         //strList <<"\" " +ui->tableWidget->horizontalHeaderItem(0)->data(Qt::DisplayRole).toString() +"\" ";
 
         for( int r = 0; r < ui->tableWidget->rowCount(); ++r ) {
+            progressBar->setValue(r);
+
             strList.clear();
             for( int c = 0; c < ui->tableWidget->columnCount(); ++c ) {
                 strList << "\" "+ui->tableWidget->item( r, c )->text()+"\" ";
@@ -442,8 +470,10 @@ void MainWindow::exportData()
             output << strList.join( ";" )+"\n";
         }
         file.close();
-
     }
+
+    progressBar->reset();
+    progressBar->hide();
 
 }
 

@@ -58,7 +58,7 @@ public:
     explicit Console(QWidget *parent = 0);
     ~Console();
 
-    void putData(QByteArray &data);
+    void putData(QByteArray data);
     void putData(QString data);
 
 protected:

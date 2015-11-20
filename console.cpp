@@ -61,10 +61,9 @@ Console::~Console()
     delete ui;
 }
 
-void Console::putData(QByteArray &data)
+void Console::putData(QByteArray data)
 {
-    insertPlainText(QString(data));    
-    qDebug()<<"data = "<<data;
+    insertPlainText(QString(data));
 
     QScrollBar *bar = verticalScrollBar();
     bar->setValue(bar->maximum());
@@ -72,8 +71,7 @@ void Console::putData(QByteArray &data)
 
 void Console::putData(QString data)
 {
-    insertPlainText(data+"\r");
-    qDebug()<<"data = "<<data;
+    insertPlainText(data+"\r\n");
 
     QScrollBar *bar = verticalScrollBar();
     bar->setValue(bar->maximum());
@@ -101,7 +99,7 @@ void Console::keyPressEvent(QKeyEvent *e)
         break;
 
     default:
-        putData(e->text().toLocal8Bit());
+        putData(e->text().toLatin1());
         qDebug()<<"text2 = "<<e;
 
     }
