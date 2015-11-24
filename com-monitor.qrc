@@ -8,5 +8,6 @@
         <file>images/clear.png</file>
         <file>images/console.png</file>
         <file>lang/com-monitor_ru.qm</file>
+        <file>images/copy.png</file>
     </qresource>
 </RCC>

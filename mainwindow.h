@@ -33,7 +33,6 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSql>
 #include <QProgressBar>
-#include <QFutureWatcher>
 
 QT_BEGIN_NAMESPACE
 
@@ -60,8 +59,9 @@ signals:
 private slots:
     void openSerialPort();
     void closeSerialPort();
+    void customMenuRequest(const QPoint &pos);
     void initTimer();
-    void about();
+    void currentDateTime();
     void writeData(const QByteArray &data);
     void fillDataInfo();
     void readData();
@@ -71,7 +71,9 @@ private slots:
     void refreshData();
     void processData();
     void exportData();
-    void handleError(QSerialPort::SerialPortError error);    
+    void copyData();
+    void handleError(QSerialPort::SerialPortError error);
+    void about();
 
 private:    
     void initActionsConnections();
@@ -87,7 +89,9 @@ private:
     SettingsDialog *settings;
     QSerialPort *serial;
     Console *console;
+    QMenu *menu;
     QTimer *refresh;
+    QTimer *timer;
     QByteArray bytes;
     QByteArray msg;
     QString format;
