@@ -158,17 +158,111 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="tabsClosable">
        <bool>false</bool>
       </property>
       <widget class="QWidget" name="viewTab">
        <attribute name="title">
-        <string>Monitoring</string>
+        <string>Monitor</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="3" rowspan="2">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLCDNumber" name="dateCurrent">
+          <property name="minimumSize">
+           <size>
+            <width>141</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="midLineWidth">
+           <number>0</number>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="digitCount">
+           <number>10</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Filled</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="2">
+         <widget class="QGroupBox" name="status">
+          <property name="title">
+           <string>Status</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="infoLabel">
+             <property name="text">
+              <string>Info:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="infoCount">
+             <property name="text">
+              <string>Status</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="warningLabel">
+             <property name="text">
+              <string>Warning:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="warningCount">
+             <property name="text">
+              <string>Status</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="errorLabel">
+             <property name="text">
+              <string>Error:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="errorCount">
+             <property name="text">
+              <string>Status</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="2" rowspan="2">
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -221,65 +315,21 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLCDNumber" name="dateCurrent">
-          <property name="minimumSize">
-           <size>
-            <width>141</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <property name="lineWidth">
-           <number>1</number>
-          </property>
-          <property name="midLineWidth">
-           <number>0</number>
-          </property>
-          <property name="smallDecimalPoint">
-           <bool>false</bool>
-          </property>
-          <property name="digitCount">
-           <number>10</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Filled</enum>
-          </property>
-          <property name="value" stdset="0">
-           <double>0.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" rowspan="2">
-         <widget class="QGroupBox" name="status">
+       </layout>
+      </widget>
+      <widget class="QWidget" name="controlTab">
+       <attribute name="title">
+        <string>Control</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0" rowspan="2">
+         <widget class="QGroupBox" name="control">
           <property name="title">
-           <string>Monitor</string>
+           <string/>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
+          <layout class="QGridLayout" name="gridLayout_3">
            <item row="0" column="0">
-            <widget class="QLabel" name="loglevelLabel">
-             <property name="text">
-              <string>Log Level:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="loglevelStatus">
-             <property name="text">
-              <string>Status</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="sensorLabel">
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
+            <widget class="QLabel" name="sensorLabel_2">
              <property name="text">
               <string>Sensor:</string>
              </property>
@@ -288,66 +338,84 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="sensorStatus">
-             <property name="text">
-              <string>Status</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="2" rowspan="2">
-         <widget class="QGroupBox" name="row">
-          <property name="maximumSize">
-           <size>
-            <width>146</width>
-            <height>83</height>
-           </size>
-          </property>
-          <property name="title">
-           <string>Row</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="rowCountLabel">
-             <property name="text">
-              <string>Row Count:</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
-            <widget class="QSpinBox" name="rowCountSet">
-             <property name="maximum">
-              <number>9999</number>
+            <widget class="QComboBox" name="sensorBoxSet">
+             <property name="enabled">
+              <bool>true</bool>
              </property>
-             <property name="value">
-              <number>100</number>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QCheckBox" name="sensorCheckAllSet">
+             <property name="text">
+              <string>All Sensors</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <spacer name="horizontalSpacer_3">
+            <widget class="QLabel" name="sensorLabel_3">
+             <property name="text">
+              <string>Data:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="dataBoxSet">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>54</width>
+               <width>72</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="rowCheckAll">
-             <property name="text">
-              <string>All Rows</string>
-             </property>
-            </widget>
-           </item>
           </layout>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="readButton">
+          <property name="text">
+           <string>Read</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" rowspan="2">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>198</width>
+            <height>68</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="writeButton">
+          <property name="text">
+           <string>Write</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -358,7 +426,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="from">
           <property name="text">
            <string>From:</string>
           </property>
@@ -378,21 +446,21 @@
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QLabel" name="logBoxLabel_2">
+         <widget class="QLabel" name="logLevelLabel">
           <property name="text">
            <string>Log Level:</string>
           </property>
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QComboBox" name="logBoxSet">
+         <widget class="QComboBox" name="logBoxExport">
           <property name="sizeAdjustPolicy">
            <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
           </property>
          </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QLabel" name="sensorLabel_2">
+         <widget class="QLabel" name="sensorLabel">
           <property name="text">
            <string>Sensor:</string>
           </property>
@@ -402,7 +470,7 @@
          </widget>
         </item>
         <item row="1" column="3">
-         <widget class="QComboBox" name="sensorBoxSet">
+         <widget class="QComboBox" name="sensorBoxExport">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -412,7 +480,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="to">
           <property name="text">
            <string>To:</string>
           </property>
@@ -422,7 +490,7 @@
          </widget>
         </item>
         <item row="1" column="4">
-         <widget class="QCheckBox" name="sensorCheckAll">
+         <widget class="QCheckBox" name="sensorCheckAllExport">
           <property name="text">
            <string>All Sensors</string>
           </property>
@@ -716,9 +784,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>sensorCheckAll</sender>
+   <sender>sensorCheckAllExport</sender>
    <signal>toggled(bool)</signal>
-   <receiver>sensorBoxSet</receiver>
+   <receiver>sensorBoxExport</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -732,18 +800,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>rowCheckAll</sender>
+   <sender>sensorCheckAllSet</sender>
    <signal>toggled(bool)</signal>
-   <receiver>rowCountSet</receiver>
+   <receiver>sensorBoxSet</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>436</x>
-     <y>486</y>
+     <x>176</x>
+     <y>457</y>
     </hint>
     <hint type="destinationlabel">
-     <x>436</x>
-     <y>458</y>
+     <x>98</x>
+     <y>457</y>
     </hint>
    </hints>
   </connection>

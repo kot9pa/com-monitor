@@ -185,6 +185,7 @@ void SettingsDialog::updateSettings()
 {
     currentSettings.name = ui->serialPortInfoListBox->currentText();
     currentSettings.refresh = ui->refreshBox->currentText().toInt();
+    currentSettings.autoconnect = ui->autoconnectCheck->isChecked();
 
     if (ui->baudRateBox->currentIndex() == 4) {
         currentSettings.baudRate = ui->baudRateBox->currentText().toInt();
@@ -225,6 +226,7 @@ void SettingsDialog::saveSettings()
     settings.setValue("StopBits", ui->stopBitsBox->currentText());
     settings.setValue("FlowControl", ui->flowControlBox->currentText());
     settings.setValue("Refresh", ui->refreshBox->currentText());
+    settings.setValue("AutoConnect", ui->autoconnectCheck->isChecked());
 
 }
 
@@ -240,5 +242,6 @@ void SettingsDialog::loadSettings()
     ui->stopBitsBox->setCurrentText(settings.value("StopBits").toString());
     ui->flowControlBox->setCurrentText(settings.value("FlowControl").toString());
     ui->refreshBox->setCurrentText(settings.value("Refresh").toString());
+    ui->autoconnectCheck->setChecked(settings.value("AutoConnect").toBool());
 
 }

@@ -6,58 +6,132 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>415</width>
-    <height>268</height>
+    <width>381</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>415</width>
-    <height>268</height>
+    <width>381</width>
+    <height>318</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>16777215</width>
-    <height>268</height>
+    <width>1000000</width>
+    <height>100000</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
-   <item row="3" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="saveButton">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>96</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="applyButton">
-       <property name="text">
-        <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="additionalOptionsGroupBox">
+     <property name="title">
+      <string>Search Options</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="searchButton">
+        <property name="text">
+         <string>Search</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="serialPortInfoListBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>73</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
-   <item row="1" column="1">
+   <item row="0" column="2" colspan="2">
+    <widget class="QGroupBox" name="refreshOption">
+     <property name="title">
+      <string>Refresh Options</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="refreshLabel">
+        <property name="text">
+         <string>Interval (sec):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="refreshBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="selectBox">
+     <property name="title">
+      <string>Select Serial Port</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QLabel" name="descriptionLabel">
+        <property name="text">
+         <string>Description:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="manufacturerLabel">
+        <property name="text">
+         <string>Manufacturer:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="serialNumberLabel">
+        <property name="text">
+         <string>Serial number:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="locationLabel">
+        <property name="text">
+         <string>Location:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="vidLabel">
+        <property name="text">
+         <string>Vendor ID:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="pidLabel">
+        <property name="text">
+         <string>Product ID:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2">
     <widget class="QGroupBox" name="parametersBox">
      <property name="title">
       <string>Select Parameters</string>
@@ -116,109 +190,60 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="selectBox">
+   <item row="2" column="0" colspan="4">
+    <widget class="QGroupBox" name="startupBox">
      <property name="title">
-      <string>Select Serial Port</string>
+      <string/>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
-       <widget class="QLabel" name="descriptionLabel">
-        <property name="text">
-         <string>Description:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="manufacturerLabel">
-        <property name="text">
-         <string>Manufacturer:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="serialNumberLabel">
-        <property name="text">
-         <string>Serial number:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="locationLabel">
-        <property name="text">
-         <string>Location:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="vidLabel">
-        <property name="text">
-         <string>Vendor ID:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="pidLabel">
-        <property name="text">
-         <string>Product ID:</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="additionalOptionsGroupBox">
-     <property name="title">
-      <string>Search Options</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="searchButton">
+       <widget class="QCheckBox" name="autoconnectCheck">
         <property name="text">
-         <string>Search device</string>
+         <string>Autoconnect to device on start</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="serialPortInfoListBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="maximumSize">
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>73</width>
-          <height>22</height>
+          <width>162</width>
+          <height>18</height>
          </size>
         </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-       </widget>
+       </spacer>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QGroupBox" name="refreshOption">
-     <property name="title">
-      <string>Refresh Options</string>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="saveButton">
+     <property name="text">
+      <string>Save</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="refreshLabel">
-        <property name="text">
-         <string>Interval (sec):</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="refreshBox"/>
-      </item>
-     </layout>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>187</width>
+       <height>13</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="3">
+    <widget class="QPushButton" name="applyButton">
+     <property name="text">
+      <string>Apply</string>
+     </property>
     </widget>
    </item>
   </layout>

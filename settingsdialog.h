@@ -59,6 +59,7 @@ public:
         QString name;
         qint8 refresh;
         qint32 baudRate;
+        bool autoconnect;
         QString stringBaudRate;
         QSerialPort::DataBits dataBits;
         QString stringDataBits;

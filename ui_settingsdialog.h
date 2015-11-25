@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
@@ -29,10 +30,22 @@ class Ui_SettingsDialog
 {
 public:
     QGridLayout *gridLayout_3;
-    QHBoxLayout *horizontalLayout;
-    QPushButton *saveButton;
-    QSpacerItem *horizontalSpacer;
-    QPushButton *applyButton;
+    QGroupBox *additionalOptionsGroupBox;
+    QHBoxLayout *horizontalLayout_3;
+    QPushButton *searchButton;
+    QComboBox *serialPortInfoListBox;
+    QGroupBox *refreshOption;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *refreshLabel;
+    QComboBox *refreshBox;
+    QGroupBox *selectBox;
+    QGridLayout *gridLayout;
+    QLabel *descriptionLabel;
+    QLabel *manufacturerLabel;
+    QLabel *serialNumberLabel;
+    QLabel *locationLabel;
+    QLabel *vidLabel;
+    QLabel *pidLabel;
     QGroupBox *parametersBox;
     QGridLayout *gridLayout_2;
     QLabel *parityLabel;
@@ -45,50 +58,100 @@ public:
     QComboBox *stopBitsBox;
     QComboBox *flowControlBox;
     QLabel *stopBitsLabel;
-    QGroupBox *selectBox;
-    QGridLayout *gridLayout;
-    QLabel *descriptionLabel;
-    QLabel *manufacturerLabel;
-    QLabel *serialNumberLabel;
-    QLabel *locationLabel;
-    QLabel *vidLabel;
-    QLabel *pidLabel;
-    QGroupBox *additionalOptionsGroupBox;
-    QHBoxLayout *horizontalLayout_3;
-    QPushButton *searchButton;
-    QComboBox *serialPortInfoListBox;
-    QGroupBox *refreshOption;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *refreshLabel;
-    QComboBox *refreshBox;
+    QGroupBox *startupBox;
+    QHBoxLayout *horizontalLayout;
+    QCheckBox *autoconnectCheck;
+    QSpacerItem *horizontalSpacer_2;
+    QPushButton *saveButton;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *applyButton;
 
     void setupUi(QDialog *SettingsDialog)
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
-        SettingsDialog->resize(415, 268);
-        SettingsDialog->setMinimumSize(QSize(415, 268));
-        SettingsDialog->setMaximumSize(QSize(16777215, 268));
+        SettingsDialog->resize(381, 318);
+        SettingsDialog->setMinimumSize(QSize(381, 318));
+        SettingsDialog->setMaximumSize(QSize(1000000, 100000));
         gridLayout_3 = new QGridLayout(SettingsDialog);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        saveButton = new QPushButton(SettingsDialog);
-        saveButton->setObjectName(QStringLiteral("saveButton"));
+        additionalOptionsGroupBox = new QGroupBox(SettingsDialog);
+        additionalOptionsGroupBox->setObjectName(QStringLiteral("additionalOptionsGroupBox"));
+        horizontalLayout_3 = new QHBoxLayout(additionalOptionsGroupBox);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        searchButton = new QPushButton(additionalOptionsGroupBox);
+        searchButton->setObjectName(QStringLiteral("searchButton"));
 
-        horizontalLayout->addWidget(saveButton);
+        horizontalLayout_3->addWidget(searchButton);
 
-        horizontalSpacer = new QSpacerItem(96, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        serialPortInfoListBox = new QComboBox(additionalOptionsGroupBox);
+        serialPortInfoListBox->setObjectName(QStringLiteral("serialPortInfoListBox"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(serialPortInfoListBox->sizePolicy().hasHeightForWidth());
+        serialPortInfoListBox->setSizePolicy(sizePolicy);
+        serialPortInfoListBox->setMaximumSize(QSize(73, 22));
+        serialPortInfoListBox->setLayoutDirection(Qt::LeftToRight);
 
-        horizontalLayout->addItem(horizontalSpacer);
-
-        applyButton = new QPushButton(SettingsDialog);
-        applyButton->setObjectName(QStringLiteral("applyButton"));
-
-        horizontalLayout->addWidget(applyButton);
+        horizontalLayout_3->addWidget(serialPortInfoListBox);
 
 
-        gridLayout_3->addLayout(horizontalLayout, 3, 0, 1, 2);
+        gridLayout_3->addWidget(additionalOptionsGroupBox, 0, 0, 1, 2);
+
+        refreshOption = new QGroupBox(SettingsDialog);
+        refreshOption->setObjectName(QStringLiteral("refreshOption"));
+        horizontalLayout_2 = new QHBoxLayout(refreshOption);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        refreshLabel = new QLabel(refreshOption);
+        refreshLabel->setObjectName(QStringLiteral("refreshLabel"));
+
+        horizontalLayout_2->addWidget(refreshLabel);
+
+        refreshBox = new QComboBox(refreshOption);
+        refreshBox->setObjectName(QStringLiteral("refreshBox"));
+
+        horizontalLayout_2->addWidget(refreshBox);
+
+
+        gridLayout_3->addWidget(refreshOption, 0, 2, 1, 2);
+
+        selectBox = new QGroupBox(SettingsDialog);
+        selectBox->setObjectName(QStringLiteral("selectBox"));
+        gridLayout = new QGridLayout(selectBox);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        descriptionLabel = new QLabel(selectBox);
+        descriptionLabel->setObjectName(QStringLiteral("descriptionLabel"));
+
+        gridLayout->addWidget(descriptionLabel, 1, 0, 1, 1);
+
+        manufacturerLabel = new QLabel(selectBox);
+        manufacturerLabel->setObjectName(QStringLiteral("manufacturerLabel"));
+
+        gridLayout->addWidget(manufacturerLabel, 2, 0, 1, 1);
+
+        serialNumberLabel = new QLabel(selectBox);
+        serialNumberLabel->setObjectName(QStringLiteral("serialNumberLabel"));
+
+        gridLayout->addWidget(serialNumberLabel, 3, 0, 1, 1);
+
+        locationLabel = new QLabel(selectBox);
+        locationLabel->setObjectName(QStringLiteral("locationLabel"));
+
+        gridLayout->addWidget(locationLabel, 4, 0, 1, 1);
+
+        vidLabel = new QLabel(selectBox);
+        vidLabel->setObjectName(QStringLiteral("vidLabel"));
+
+        gridLayout->addWidget(vidLabel, 5, 0, 1, 1);
+
+        pidLabel = new QLabel(selectBox);
+        pidLabel->setObjectName(QStringLiteral("pidLabel"));
+
+        gridLayout->addWidget(pidLabel, 6, 0, 1, 1);
+
+
+        gridLayout_3->addWidget(selectBox, 1, 0, 1, 2);
 
         parametersBox = new QGroupBox(SettingsDialog);
         parametersBox->setObjectName(QStringLiteral("parametersBox"));
@@ -145,85 +208,37 @@ public:
         gridLayout_2->addWidget(stopBitsLabel, 3, 0, 1, 1);
 
 
-        gridLayout_3->addWidget(parametersBox, 1, 1, 1, 1);
+        gridLayout_3->addWidget(parametersBox, 1, 2, 1, 2);
 
-        selectBox = new QGroupBox(SettingsDialog);
-        selectBox->setObjectName(QStringLiteral("selectBox"));
-        gridLayout = new QGridLayout(selectBox);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        descriptionLabel = new QLabel(selectBox);
-        descriptionLabel->setObjectName(QStringLiteral("descriptionLabel"));
+        startupBox = new QGroupBox(SettingsDialog);
+        startupBox->setObjectName(QStringLiteral("startupBox"));
+        horizontalLayout = new QHBoxLayout(startupBox);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        autoconnectCheck = new QCheckBox(startupBox);
+        autoconnectCheck->setObjectName(QStringLiteral("autoconnectCheck"));
 
-        gridLayout->addWidget(descriptionLabel, 1, 0, 1, 1);
+        horizontalLayout->addWidget(autoconnectCheck);
 
-        manufacturerLabel = new QLabel(selectBox);
-        manufacturerLabel->setObjectName(QStringLiteral("manufacturerLabel"));
+        horizontalSpacer_2 = new QSpacerItem(162, 18, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        gridLayout->addWidget(manufacturerLabel, 2, 0, 1, 1);
-
-        serialNumberLabel = new QLabel(selectBox);
-        serialNumberLabel->setObjectName(QStringLiteral("serialNumberLabel"));
-
-        gridLayout->addWidget(serialNumberLabel, 3, 0, 1, 1);
-
-        locationLabel = new QLabel(selectBox);
-        locationLabel->setObjectName(QStringLiteral("locationLabel"));
-
-        gridLayout->addWidget(locationLabel, 4, 0, 1, 1);
-
-        vidLabel = new QLabel(selectBox);
-        vidLabel->setObjectName(QStringLiteral("vidLabel"));
-
-        gridLayout->addWidget(vidLabel, 5, 0, 1, 1);
-
-        pidLabel = new QLabel(selectBox);
-        pidLabel->setObjectName(QStringLiteral("pidLabel"));
-
-        gridLayout->addWidget(pidLabel, 6, 0, 1, 1);
+        horizontalLayout->addItem(horizontalSpacer_2);
 
 
-        gridLayout_3->addWidget(selectBox, 1, 0, 1, 1);
+        gridLayout_3->addWidget(startupBox, 2, 0, 1, 4);
 
-        additionalOptionsGroupBox = new QGroupBox(SettingsDialog);
-        additionalOptionsGroupBox->setObjectName(QStringLiteral("additionalOptionsGroupBox"));
-        horizontalLayout_3 = new QHBoxLayout(additionalOptionsGroupBox);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        searchButton = new QPushButton(additionalOptionsGroupBox);
-        searchButton->setObjectName(QStringLiteral("searchButton"));
+        saveButton = new QPushButton(SettingsDialog);
+        saveButton->setObjectName(QStringLiteral("saveButton"));
 
-        horizontalLayout_3->addWidget(searchButton);
+        gridLayout_3->addWidget(saveButton, 3, 0, 1, 1);
 
-        serialPortInfoListBox = new QComboBox(additionalOptionsGroupBox);
-        serialPortInfoListBox->setObjectName(QStringLiteral("serialPortInfoListBox"));
-        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(serialPortInfoListBox->sizePolicy().hasHeightForWidth());
-        serialPortInfoListBox->setSizePolicy(sizePolicy);
-        serialPortInfoListBox->setMaximumSize(QSize(73, 22));
-        serialPortInfoListBox->setLayoutDirection(Qt::LeftToRight);
+        horizontalSpacer = new QSpacerItem(187, 13, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_3->addWidget(serialPortInfoListBox);
+        gridLayout_3->addItem(horizontalSpacer, 3, 1, 1, 2);
 
+        applyButton = new QPushButton(SettingsDialog);
+        applyButton->setObjectName(QStringLiteral("applyButton"));
 
-        gridLayout_3->addWidget(additionalOptionsGroupBox, 0, 0, 1, 1);
-
-        refreshOption = new QGroupBox(SettingsDialog);
-        refreshOption->setObjectName(QStringLiteral("refreshOption"));
-        horizontalLayout_2 = new QHBoxLayout(refreshOption);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        refreshLabel = new QLabel(refreshOption);
-        refreshLabel->setObjectName(QStringLiteral("refreshLabel"));
-
-        horizontalLayout_2->addWidget(refreshLabel);
-
-        refreshBox = new QComboBox(refreshOption);
-        refreshBox->setObjectName(QStringLiteral("refreshBox"));
-
-        horizontalLayout_2->addWidget(refreshBox);
-
-
-        gridLayout_3->addWidget(refreshOption, 0, 1, 1, 1);
+        gridLayout_3->addWidget(applyButton, 3, 3, 1, 1);
 
         QWidget::setTabOrder(searchButton, serialPortInfoListBox);
         QWidget::setTabOrder(serialPortInfoListBox, baudRateBox);
@@ -242,14 +257,10 @@ public:
     void retranslateUi(QDialog *SettingsDialog)
     {
         SettingsDialog->setWindowTitle(QApplication::translate("SettingsDialog", "Settings", 0));
-        saveButton->setText(QApplication::translate("SettingsDialog", "Save", 0));
-        applyButton->setText(QApplication::translate("SettingsDialog", "Apply", 0));
-        parametersBox->setTitle(QApplication::translate("SettingsDialog", "Select Parameters", 0));
-        parityLabel->setText(QApplication::translate("SettingsDialog", "Parity:", 0));
-        baudRateLabel->setText(QApplication::translate("SettingsDialog", "BaudRate:", 0));
-        dataBitsLabel->setText(QApplication::translate("SettingsDialog", "Data bits:", 0));
-        flowControlLabel->setText(QApplication::translate("SettingsDialog", "Flow control:", 0));
-        stopBitsLabel->setText(QApplication::translate("SettingsDialog", "Stop bits:", 0));
+        additionalOptionsGroupBox->setTitle(QApplication::translate("SettingsDialog", "Search Options", 0));
+        searchButton->setText(QApplication::translate("SettingsDialog", "Search", 0));
+        refreshOption->setTitle(QApplication::translate("SettingsDialog", "Refresh Options", 0));
+        refreshLabel->setText(QApplication::translate("SettingsDialog", "Interval (sec):", 0));
         selectBox->setTitle(QApplication::translate("SettingsDialog", "Select Serial Port", 0));
         descriptionLabel->setText(QApplication::translate("SettingsDialog", "Description:", 0));
         manufacturerLabel->setText(QApplication::translate("SettingsDialog", "Manufacturer:", 0));
@@ -257,10 +268,16 @@ public:
         locationLabel->setText(QApplication::translate("SettingsDialog", "Location:", 0));
         vidLabel->setText(QApplication::translate("SettingsDialog", "Vendor ID:", 0));
         pidLabel->setText(QApplication::translate("SettingsDialog", "Product ID:", 0));
-        additionalOptionsGroupBox->setTitle(QApplication::translate("SettingsDialog", "Search Options", 0));
-        searchButton->setText(QApplication::translate("SettingsDialog", "Search device", 0));
-        refreshOption->setTitle(QApplication::translate("SettingsDialog", "Refresh Options", 0));
-        refreshLabel->setText(QApplication::translate("SettingsDialog", "Interval (sec):", 0));
+        parametersBox->setTitle(QApplication::translate("SettingsDialog", "Select Parameters", 0));
+        parityLabel->setText(QApplication::translate("SettingsDialog", "Parity:", 0));
+        baudRateLabel->setText(QApplication::translate("SettingsDialog", "BaudRate:", 0));
+        dataBitsLabel->setText(QApplication::translate("SettingsDialog", "Data bits:", 0));
+        flowControlLabel->setText(QApplication::translate("SettingsDialog", "Flow control:", 0));
+        stopBitsLabel->setText(QApplication::translate("SettingsDialog", "Stop bits:", 0));
+        startupBox->setTitle(QString());
+        autoconnectCheck->setText(QApplication::translate("SettingsDialog", "Autoconnect to device on start", 0));
+        saveButton->setText(QApplication::translate("SettingsDialog", "Save", 0));
+        applyButton->setText(QApplication::translate("SettingsDialog", "Apply", 0));
     } // retranslateUi
 
 };

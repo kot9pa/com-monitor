@@ -96,6 +96,7 @@ private:
     QByteArray msg;
     QString format;
     QString settingsFile;
+    QStringList listSensor;
     QSqlDatabase db;
 
 };

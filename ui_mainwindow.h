@@ -26,7 +26,6 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
@@ -55,32 +54,41 @@ public:
     QTableWidget *tableWidget;
     QTabWidget *tabWidget;
     QWidget *viewTab;
-    QGridLayout *gridLayout_3;
-    QSpacerItem *horizontalSpacer;
-    QLCDNumber *timeCurrent;
+    QGridLayout *gridLayout_2;
     QLCDNumber *dateCurrent;
     QGroupBox *status;
-    QGridLayout *gridLayout_2;
-    QLabel *loglevelLabel;
-    QLabel *loglevelStatus;
-    QLabel *sensorLabel;
-    QLabel *sensorStatus;
-    QGroupBox *row;
     QGridLayout *gridLayout;
-    QLabel *rowCountLabel;
-    QSpinBox *rowCountSet;
-    QSpacerItem *horizontalSpacer_3;
-    QCheckBox *rowCheckAll;
-    QWidget *exportTab;
-    QGridLayout *gridLayout_4;
-    QLabel *label;
-    QDateTimeEdit *dateTimeTo;
-    QLabel *logBoxLabel_2;
-    QComboBox *logBoxSet;
+    QLabel *infoLabel;
+    QLabel *infoCount;
+    QLabel *warningLabel;
+    QLabel *warningCount;
+    QLabel *errorLabel;
+    QLabel *errorCount;
+    QSpacerItem *horizontalSpacer;
+    QLCDNumber *timeCurrent;
+    QWidget *controlTab;
+    QGridLayout *gridLayout_5;
+    QGroupBox *control;
+    QGridLayout *gridLayout_3;
     QLabel *sensorLabel_2;
     QComboBox *sensorBoxSet;
-    QLabel *label_2;
-    QCheckBox *sensorCheckAll;
+    QCheckBox *sensorCheckAllSet;
+    QLabel *sensorLabel_3;
+    QComboBox *dataBoxSet;
+    QSpacerItem *horizontalSpacer_2;
+    QPushButton *readButton;
+    QSpacerItem *horizontalSpacer_3;
+    QPushButton *writeButton;
+    QWidget *exportTab;
+    QGridLayout *gridLayout_4;
+    QLabel *from;
+    QDateTimeEdit *dateTimeTo;
+    QLabel *logLevelLabel;
+    QComboBox *logBoxExport;
+    QLabel *sensorLabel;
+    QComboBox *sensorBoxExport;
+    QLabel *to;
+    QCheckBox *sensorCheckAllExport;
     QSpacerItem *horizontalSpacer_4;
     QDateTimeEdit *dateTimeFrom;
     QPushButton *exportButton;
@@ -207,13 +215,69 @@ public:
         tabWidget->setTabsClosable(false);
         viewTab = new QWidget();
         viewTab->setObjectName(QStringLiteral("viewTab"));
-        gridLayout_3 = new QGridLayout(viewTab);
-        gridLayout_3->setSpacing(6);
-        gridLayout_3->setContentsMargins(11, 11, 11, 11);
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_2 = new QGridLayout(viewTab);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        dateCurrent = new QLCDNumber(viewTab);
+        dateCurrent->setObjectName(QStringLiteral("dateCurrent"));
+        dateCurrent->setMinimumSize(QSize(141, 0));
+        dateCurrent->setFrameShape(QFrame::NoFrame);
+        dateCurrent->setFrameShadow(QFrame::Raised);
+        dateCurrent->setLineWidth(1);
+        dateCurrent->setMidLineWidth(0);
+        dateCurrent->setSmallDecimalPoint(false);
+        dateCurrent->setDigitCount(10);
+        dateCurrent->setSegmentStyle(QLCDNumber::Filled);
+        dateCurrent->setProperty("value", QVariant(0));
+
+        gridLayout_2->addWidget(dateCurrent, 0, 0, 1, 1);
+
+        status = new QGroupBox(viewTab);
+        status->setObjectName(QStringLiteral("status"));
+        gridLayout = new QGridLayout(status);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        infoLabel = new QLabel(status);
+        infoLabel->setObjectName(QStringLiteral("infoLabel"));
+        infoLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        gridLayout->addWidget(infoLabel, 0, 0, 1, 1);
+
+        infoCount = new QLabel(status);
+        infoCount->setObjectName(QStringLiteral("infoCount"));
+
+        gridLayout->addWidget(infoCount, 0, 1, 1, 1);
+
+        warningLabel = new QLabel(status);
+        warningLabel->setObjectName(QStringLiteral("warningLabel"));
+        warningLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        gridLayout->addWidget(warningLabel, 1, 0, 1, 1);
+
+        warningCount = new QLabel(status);
+        warningCount->setObjectName(QStringLiteral("warningCount"));
+
+        gridLayout->addWidget(warningCount, 1, 1, 1, 1);
+
+        errorLabel = new QLabel(status);
+        errorLabel->setObjectName(QStringLiteral("errorLabel"));
+        errorLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        gridLayout->addWidget(errorLabel, 2, 0, 1, 1);
+
+        errorCount = new QLabel(status);
+        errorCount->setObjectName(QStringLiteral("errorCount"));
+
+        gridLayout->addWidget(errorCount, 2, 1, 1, 1);
+
+
+        gridLayout_2->addWidget(status, 0, 1, 2, 1);
+
         horizontalSpacer = new QSpacerItem(87, 68, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        gridLayout_3->addItem(horizontalSpacer, 0, 3, 2, 1);
+        gridLayout_2->addItem(horizontalSpacer, 0, 2, 2, 1);
 
         timeCurrent = new QLCDNumber(viewTab);
         timeCurrent->setObjectName(QStringLiteral("timeCurrent"));
@@ -231,96 +295,85 @@ public:
         timeCurrent->setSegmentStyle(QLCDNumber::Flat);
         timeCurrent->setProperty("value", QVariant(0));
 
-        gridLayout_3->addWidget(timeCurrent, 1, 0, 1, 1);
-
-        dateCurrent = new QLCDNumber(viewTab);
-        dateCurrent->setObjectName(QStringLiteral("dateCurrent"));
-        dateCurrent->setMinimumSize(QSize(141, 0));
-        dateCurrent->setFrameShape(QFrame::NoFrame);
-        dateCurrent->setFrameShadow(QFrame::Raised);
-        dateCurrent->setLineWidth(1);
-        dateCurrent->setMidLineWidth(0);
-        dateCurrent->setSmallDecimalPoint(false);
-        dateCurrent->setDigitCount(10);
-        dateCurrent->setSegmentStyle(QLCDNumber::Filled);
-        dateCurrent->setProperty("value", QVariant(0));
-
-        gridLayout_3->addWidget(dateCurrent, 0, 0, 1, 1);
-
-        status = new QGroupBox(viewTab);
-        status->setObjectName(QStringLiteral("status"));
-        gridLayout_2 = new QGridLayout(status);
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setContentsMargins(11, 11, 11, 11);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        loglevelLabel = new QLabel(status);
-        loglevelLabel->setObjectName(QStringLiteral("loglevelLabel"));
-
-        gridLayout_2->addWidget(loglevelLabel, 0, 0, 1, 1);
-
-        loglevelStatus = new QLabel(status);
-        loglevelStatus->setObjectName(QStringLiteral("loglevelStatus"));
-
-        gridLayout_2->addWidget(loglevelStatus, 0, 1, 1, 1);
-
-        sensorLabel = new QLabel(status);
-        sensorLabel->setObjectName(QStringLiteral("sensorLabel"));
-        sensorLabel->setLayoutDirection(Qt::LeftToRight);
-        sensorLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-
-        gridLayout_2->addWidget(sensorLabel, 1, 0, 1, 1);
-
-        sensorStatus = new QLabel(status);
-        sensorStatus->setObjectName(QStringLiteral("sensorStatus"));
-
-        gridLayout_2->addWidget(sensorStatus, 1, 1, 1, 1);
-
-
-        gridLayout_3->addWidget(status, 0, 1, 2, 1);
-
-        row = new QGroupBox(viewTab);
-        row->setObjectName(QStringLiteral("row"));
-        row->setMaximumSize(QSize(146, 83));
-        gridLayout = new QGridLayout(row);
-        gridLayout->setSpacing(6);
-        gridLayout->setContentsMargins(11, 11, 11, 11);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        rowCountLabel = new QLabel(row);
-        rowCountLabel->setObjectName(QStringLiteral("rowCountLabel"));
-
-        gridLayout->addWidget(rowCountLabel, 0, 0, 1, 1);
-
-        rowCountSet = new QSpinBox(row);
-        rowCountSet->setObjectName(QStringLiteral("rowCountSet"));
-        rowCountSet->setMaximum(9999);
-        rowCountSet->setValue(100);
-
-        gridLayout->addWidget(rowCountSet, 0, 1, 1, 1);
-
-        horizontalSpacer_3 = new QSpacerItem(54, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout->addItem(horizontalSpacer_3, 1, 0, 1, 1);
-
-        rowCheckAll = new QCheckBox(row);
-        rowCheckAll->setObjectName(QStringLiteral("rowCheckAll"));
-
-        gridLayout->addWidget(rowCheckAll, 1, 1, 1, 1);
-
-
-        gridLayout_3->addWidget(row, 0, 2, 2, 1);
+        gridLayout_2->addWidget(timeCurrent, 1, 0, 1, 1);
 
         tabWidget->addTab(viewTab, QString());
+        controlTab = new QWidget();
+        controlTab->setObjectName(QStringLiteral("controlTab"));
+        gridLayout_5 = new QGridLayout(controlTab);
+        gridLayout_5->setSpacing(6);
+        gridLayout_5->setContentsMargins(11, 11, 11, 11);
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        control = new QGroupBox(controlTab);
+        control->setObjectName(QStringLiteral("control"));
+        gridLayout_3 = new QGridLayout(control);
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setContentsMargins(11, 11, 11, 11);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        sensorLabel_2 = new QLabel(control);
+        sensorLabel_2->setObjectName(QStringLiteral("sensorLabel_2"));
+        sensorLabel_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        gridLayout_3->addWidget(sensorLabel_2, 0, 0, 1, 1);
+
+        sensorBoxSet = new QComboBox(control);
+        sensorBoxSet->setObjectName(QStringLiteral("sensorBoxSet"));
+        sensorBoxSet->setEnabled(true);
+        sensorBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+
+        gridLayout_3->addWidget(sensorBoxSet, 0, 1, 1, 1);
+
+        sensorCheckAllSet = new QCheckBox(control);
+        sensorCheckAllSet->setObjectName(QStringLiteral("sensorCheckAllSet"));
+
+        gridLayout_3->addWidget(sensorCheckAllSet, 0, 2, 1, 1);
+
+        sensorLabel_3 = new QLabel(control);
+        sensorLabel_3->setObjectName(QStringLiteral("sensorLabel_3"));
+        sensorLabel_3->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+
+        gridLayout_3->addWidget(sensorLabel_3, 1, 0, 1, 1);
+
+        dataBoxSet = new QComboBox(control);
+        dataBoxSet->setObjectName(QStringLiteral("dataBoxSet"));
+        dataBoxSet->setEnabled(true);
+        dataBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+
+        gridLayout_3->addWidget(dataBoxSet, 1, 1, 1, 1);
+
+        horizontalSpacer_2 = new QSpacerItem(72, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout_3->addItem(horizontalSpacer_2, 1, 2, 1, 1);
+
+
+        gridLayout_5->addWidget(control, 0, 0, 2, 1);
+
+        readButton = new QPushButton(controlTab);
+        readButton->setObjectName(QStringLiteral("readButton"));
+
+        gridLayout_5->addWidget(readButton, 0, 1, 1, 1);
+
+        horizontalSpacer_3 = new QSpacerItem(198, 68, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout_5->addItem(horizontalSpacer_3, 0, 2, 2, 1);
+
+        writeButton = new QPushButton(controlTab);
+        writeButton->setObjectName(QStringLiteral("writeButton"));
+
+        gridLayout_5->addWidget(writeButton, 1, 1, 1, 1);
+
+        tabWidget->addTab(controlTab, QString());
         exportTab = new QWidget();
         exportTab->setObjectName(QStringLiteral("exportTab"));
         gridLayout_4 = new QGridLayout(exportTab);
         gridLayout_4->setSpacing(6);
         gridLayout_4->setContentsMargins(11, 11, 11, 11);
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        label = new QLabel(exportTab);
-        label->setObjectName(QStringLiteral("label"));
-        label->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        from = new QLabel(exportTab);
+        from->setObjectName(QStringLiteral("from"));
+        from->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        gridLayout_4->addWidget(label, 0, 0, 1, 1);
+        gridLayout_4->addWidget(from, 0, 0, 1, 1);
 
         dateTimeTo = new QDateTimeEdit(exportTab);
         dateTimeTo->setObjectName(QStringLiteral("dateTimeTo"));
@@ -328,40 +381,40 @@ public:
 
         gridLayout_4->addWidget(dateTimeTo, 1, 1, 1, 1);
 
-        logBoxLabel_2 = new QLabel(exportTab);
-        logBoxLabel_2->setObjectName(QStringLiteral("logBoxLabel_2"));
+        logLevelLabel = new QLabel(exportTab);
+        logLevelLabel->setObjectName(QStringLiteral("logLevelLabel"));
 
-        gridLayout_4->addWidget(logBoxLabel_2, 0, 2, 1, 1);
+        gridLayout_4->addWidget(logLevelLabel, 0, 2, 1, 1);
 
-        logBoxSet = new QComboBox(exportTab);
-        logBoxSet->setObjectName(QStringLiteral("logBoxSet"));
-        logBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+        logBoxExport = new QComboBox(exportTab);
+        logBoxExport->setObjectName(QStringLiteral("logBoxExport"));
+        logBoxExport->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
 
-        gridLayout_4->addWidget(logBoxSet, 0, 3, 1, 1);
+        gridLayout_4->addWidget(logBoxExport, 0, 3, 1, 1);
 
-        sensorLabel_2 = new QLabel(exportTab);
-        sensorLabel_2->setObjectName(QStringLiteral("sensorLabel_2"));
-        sensorLabel_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        sensorLabel = new QLabel(exportTab);
+        sensorLabel->setObjectName(QStringLiteral("sensorLabel"));
+        sensorLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        gridLayout_4->addWidget(sensorLabel_2, 1, 2, 1, 1);
+        gridLayout_4->addWidget(sensorLabel, 1, 2, 1, 1);
 
-        sensorBoxSet = new QComboBox(exportTab);
-        sensorBoxSet->setObjectName(QStringLiteral("sensorBoxSet"));
-        sensorBoxSet->setEnabled(true);
-        sensorBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+        sensorBoxExport = new QComboBox(exportTab);
+        sensorBoxExport->setObjectName(QStringLiteral("sensorBoxExport"));
+        sensorBoxExport->setEnabled(true);
+        sensorBoxExport->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
 
-        gridLayout_4->addWidget(sensorBoxSet, 1, 3, 1, 1);
+        gridLayout_4->addWidget(sensorBoxExport, 1, 3, 1, 1);
 
-        label_2 = new QLabel(exportTab);
-        label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        to = new QLabel(exportTab);
+        to->setObjectName(QStringLiteral("to"));
+        to->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        gridLayout_4->addWidget(label_2, 1, 0, 1, 1);
+        gridLayout_4->addWidget(to, 1, 0, 1, 1);
 
-        sensorCheckAll = new QCheckBox(exportTab);
-        sensorCheckAll->setObjectName(QStringLiteral("sensorCheckAll"));
+        sensorCheckAllExport = new QCheckBox(exportTab);
+        sensorCheckAllExport->setObjectName(QStringLiteral("sensorCheckAllExport"));
 
-        gridLayout_4->addWidget(sensorCheckAll, 1, 4, 1, 1);
+        gridLayout_4->addWidget(sensorCheckAllExport, 1, 4, 1, 1);
 
         horizontalSpacer_4 = new QSpacerItem(85, 48, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -430,10 +483,10 @@ public:
         retranslateUi(MainWindow);
         QObject::connect(actionToolBar, SIGNAL(toggled(bool)), mainToolBar, SLOT(setVisible(bool)));
         QObject::connect(actionStatusBar, SIGNAL(toggled(bool)), statusBar, SLOT(setVisible(bool)));
-        QObject::connect(sensorCheckAll, SIGNAL(toggled(bool)), sensorBoxSet, SLOT(setDisabled(bool)));
-        QObject::connect(rowCheckAll, SIGNAL(toggled(bool)), rowCountSet, SLOT(setDisabled(bool)));
+        QObject::connect(sensorCheckAllExport, SIGNAL(toggled(bool)), sensorBoxExport, SLOT(setDisabled(bool)));
+        QObject::connect(sensorCheckAllSet, SIGNAL(toggled(bool)), sensorBoxSet, SLOT(setDisabled(bool)));
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -487,21 +540,27 @@ public:
         ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Status", 0));
         QTableWidgetItem *___qtablewidgetitem4 = tableWidget->horizontalHeaderItem(4);
         ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Message", 0));
-        status->setTitle(QApplication::translate("MainWindow", "Monitor", 0));
-        loglevelLabel->setText(QApplication::translate("MainWindow", "Log Level:", 0));
-        loglevelStatus->setText(QApplication::translate("MainWindow", "Status", 0));
-        sensorLabel->setText(QApplication::translate("MainWindow", "Sensor:", 0));
-        sensorStatus->setText(QApplication::translate("MainWindow", "Status", 0));
-        row->setTitle(QApplication::translate("MainWindow", "Row", 0));
-        rowCountLabel->setText(QApplication::translate("MainWindow", "Row Count:", 0));
-        rowCheckAll->setText(QApplication::translate("MainWindow", "All Rows", 0));
-        tabWidget->setTabText(tabWidget->indexOf(viewTab), QApplication::translate("MainWindow", "Monitoring", 0));
-        label->setText(QApplication::translate("MainWindow", "From:", 0));
-        dateTimeTo->setDisplayFormat(QApplication::translate("MainWindow", "dd.MM.yyyy", 0));
-        logBoxLabel_2->setText(QApplication::translate("MainWindow", "Log Level:", 0));
+        status->setTitle(QApplication::translate("MainWindow", "Status", 0));
+        infoLabel->setText(QApplication::translate("MainWindow", "Info:", 0));
+        infoCount->setText(QApplication::translate("MainWindow", "Status", 0));
+        warningLabel->setText(QApplication::translate("MainWindow", "Warning:", 0));
+        warningCount->setText(QApplication::translate("MainWindow", "Status", 0));
+        errorLabel->setText(QApplication::translate("MainWindow", "Error:", 0));
+        errorCount->setText(QApplication::translate("MainWindow", "Status", 0));
+        tabWidget->setTabText(tabWidget->indexOf(viewTab), QApplication::translate("MainWindow", "Monitor", 0));
+        control->setTitle(QString());
         sensorLabel_2->setText(QApplication::translate("MainWindow", "Sensor:", 0));
-        label_2->setText(QApplication::translate("MainWindow", "To:", 0));
-        sensorCheckAll->setText(QApplication::translate("MainWindow", "All Sensors", 0));
+        sensorCheckAllSet->setText(QApplication::translate("MainWindow", "All Sensors", 0));
+        sensorLabel_3->setText(QApplication::translate("MainWindow", "Data:", 0));
+        readButton->setText(QApplication::translate("MainWindow", "Read", 0));
+        writeButton->setText(QApplication::translate("MainWindow", "Write", 0));
+        tabWidget->setTabText(tabWidget->indexOf(controlTab), QApplication::translate("MainWindow", "Control", 0));
+        from->setText(QApplication::translate("MainWindow", "From:", 0));
+        dateTimeTo->setDisplayFormat(QApplication::translate("MainWindow", "dd.MM.yyyy", 0));
+        logLevelLabel->setText(QApplication::translate("MainWindow", "Log Level:", 0));
+        sensorLabel->setText(QApplication::translate("MainWindow", "Sensor:", 0));
+        to->setText(QApplication::translate("MainWindow", "To:", 0));
+        sensorCheckAllExport->setText(QApplication::translate("MainWindow", "All Sensors", 0));
         dateTimeFrom->setDisplayFormat(QApplication::translate("MainWindow", "dd.MM.yyyy", 0));
         exportButton->setText(QApplication::translate("MainWindow", "Export", 0));
         tabWidget->setTabText(tabWidget->indexOf(exportTab), QApplication::translate("MainWindow", "Options", 0));
