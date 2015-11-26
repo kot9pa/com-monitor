@@ -45,8 +45,8 @@ Console::Console(QWidget *parent):
     QPlainTextEdit(parent),
     ui(new Ui::Console)
 {
-
     ui->setupUi(this);
+    setAutoFillBackground(true);
 
     //document()->setMaximumBlockCount(100);
     QPalette p = palette();

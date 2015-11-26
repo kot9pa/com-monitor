@@ -46,7 +46,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    qRegisterMetaType<QVector<int> >("QVector<int>");
+    qRegisterMetaType<QVector<int> >("QVector<int>");    
+    warningCount = 0;
+    errorCount = 0;
+    infoCount = 0;
 
     console = new Console;
     serial = new QSerialPort(this);
@@ -80,6 +83,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->logBoxExport->addItem(tr("Info (II)"));
     ui->logBoxExport->addItem(tr("Warning (WW)"));
     ui->logBoxExport->addItem(tr("Error (EE)"));
+
+    ui->warningCount->setText(QString::number(warningCount));
+    ui->warningCount->setStyleSheet("QLabel {font:bold; color:yellow;}");
+    ui->errorCount->setText(QString::number(errorCount));
+    ui->errorCount->setStyleSheet("QLabel {font:bold; color:red;}");
+    ui->infoCount->setText(QString::number(infoCount));
+    ui->infoCount->setStyleSheet("QLabel {font:bold; color:green;}");
 
     ui->tableWidget->setColumnHidden(0, true);
     ui->dateTimeFrom->setDate(QDate::currentDate());
@@ -134,6 +144,8 @@ void MainWindow::initTimer()
         refresh->setInterval(interval);
         refresh->start();
     }
+
+    ui->statusBar->showMessage(tr("Refresh Data.."));
 
     qDebug()<<"interval = "<<refresh->interval();
 
@@ -214,7 +226,8 @@ void MainWindow::openSerialPort()
     serial->setParity(p.parity);
     serial->setStopBits(p.stopBits);
     serial->setFlowControl(p.flowControl);
-    serial->setReadBufferSize(65536);
+    serial->setReadBufferSize(65536);    
+
     if (serial->open(QIODevice::ReadWrite)) {
         refresh->setInterval(p.refresh*1000);
         ui->actionConnect->setEnabled(false);
@@ -255,6 +268,9 @@ void MainWindow::writeData(const QByteArray &data)
     serial->write(data);
     qDebug()<<"write = " << data;
 
+    //console->putData(data);
+    ui->statusBar->showMessage(tr("Write Data.."));
+
     bytes.clear();
 
 }
@@ -269,6 +285,8 @@ void MainWindow::refreshData()
 
     initTimer();
 
+    //ui->statusBar->showMessage(tr("Refresh Data.."));
+
     //bytes.clear();
 
 }
@@ -279,7 +297,8 @@ void MainWindow::readData()
 
     bytes.append(serial->readAll());
 
-    console->putData(bytes);
+    //console->putData(bytes);
+    ui->statusBar->showMessage(tr("Read Data.."));
 
     qDebug()<<"read = " << bytes;
 
@@ -287,7 +306,9 @@ void MainWindow::readData()
 
 void MainWindow::processData()
 {
-    //console->putData(bytes);
+    console->putData(bytes);
+
+    ui->statusBar->showMessage(tr("Process Data.."));
 
     QBitArray bits(bytes.count()*8);
 
@@ -314,6 +335,11 @@ void MainWindow::processData()
         qDebug()<<"message = " << bytes.mid(47, 23);
         query.exec();
 
+        int status = bytes.mid(44, 1).toInt();
+        if (status==6 || status==7) errorCount++;
+        if (status==8 || status==9) warningCount++;
+        else infoCount++;
+
         recordData();
 
     }
@@ -329,22 +355,11 @@ void MainWindow::fillDataInfo()
     clearData();
     fillSensorInfo();
 
-    //QString dateFrom = ui->dateTimeFrom->date().toString("yyyy-MM-dd");
-    //QString dateTo = ui->dateTimeTo->date().toString("yyyy-MM-dd");
     QString date = QDate::currentDate().toString("yyyy-MM-dd");
-    //QString sensor;
     QString data;
 
-    /*if(ui->sensorCheckAll->isChecked()) {
-        ui->sensorBoxSet->setCurrentIndex(ui->sensorBoxSet->findText("All"));
-        sensor = ui->sensorBoxSet->itemData(ui->sensorBoxSet->currentIndex()).toString();
-    } else  {
-        ui->sensorBoxSet->removeItem(ui->sensorBoxSet->findText("All"));
-        sensor = ui->sensorBoxSet->currentText();
-    }*/
-
     foreach(QString sensor, listSensor) {
-        //listSensor.removeOne(sensor);
+
         data = "SELECT * FROM tabMain "
                "WHERE date(datetime) = '%1' "
                "AND sensor = %2 "
@@ -354,48 +369,6 @@ void MainWindow::fillDataInfo()
         qDebug()<<"sensor = " << sensor;
 
     }
-
-    /*switch (level) {
-    case 0:
-        data = "SELECT * FROM tabMain "
-               "WHERE date(datetime) between '%1' and '%2' "
-               "AND sensor IN (%3) "
-               "ORDER BY id DESC LIMIT %4"; //ALL
-        viewData(data.arg(dateFrom).arg(dateTo).arg(sensor).arg(limit));
-        ui->loglevelStatus->setStyleSheet("QLabel {color:black;}");
-        break;
-
-    case 1:
-        data = "SELECT * FROM tabMain "
-               "WHERE status NOT IN (6,7,8,9) "
-               "AND date(datetime) between '%1' and '%2' "
-               "AND sensor IN (%3) "
-               "ORDER BY id DESC LIMIT %4"; //INFO
-        viewData(data.arg(dateFrom).arg(dateTo).arg(sensor).arg(limit));
-        ui->loglevelStatus->setStyleSheet("QLabel {color:green;}");
-        break;
-
-    case 2:
-        data = "SELECT * FROM tabMain "
-               "WHERE status IN (8,9) "
-               "AND date(datetime) between '%1' and '%2' "
-               "AND sensor IN (%3) "
-               "ORDER BY id DESC LIMIT %4"; //WARNING
-        viewData(data.arg(dateFrom).arg(dateTo).arg(sensor).arg(limit));
-        ui->loglevelStatus->setStyleSheet("QLabel {color:yellow;}");
-        break;
-
-    case 3:
-        data = "SELECT * FROM tabMain "
-               "WHERE status IN (6,7) "
-               "AND date(datetime) between '%1' and '%2' "
-               "AND sensor IN (%3) "
-               "ORDER BY id DESC LIMIT %4"; //ERROR
-        viewData(data.arg(dateFrom).arg(dateTo).arg(sensor).arg(limit));
-        ui->loglevelStatus->setStyleSheet("QLabel {color:red;}");
-        break;
-
-    }*/
 
 }
 
@@ -428,22 +401,8 @@ void MainWindow::fillSensorInfo()
 }
 
 void MainWindow::viewData(QString data)
-{
+{   
     QSqlQuery query;
-    QSqlRecord recordCount;
-    query.prepare(QString("SELECT COUNT(*) FROM (%1) AS subquery").arg(data));
-    query.exec();
-    query.next();    
-    recordCount = query.record();
-
-    int value = 0;
-    int qSize = query.value(0).toInt();
-
-    qDebug()<<"count = "<<qSize;
-
-    progressBar->setMaximum(qSize);
-    progressBar->show();
-
     query.exec(data);
     while (query.next())
     {
@@ -455,23 +414,23 @@ void MainWindow::viewData(QString data)
         ui->tableWidget->setItem(0, 3, new QTableWidgetItem(query.value(3).toString()));
         ui->tableWidget->setItem(0, 4, new QTableWidgetItem(query.value(4).toString()));
 
-        progressBar->setValue(++value);
-
         QString status = query.value(3).toString();
 
         if (status=="6" || status=="7") {
-            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::red);
-            //ui->errorCount->setText();
+            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::red);            
+            ui->errorCount->setText(QString::number(errorCount));
+
 
         }
         else if (status=="8" || status=="9") {
-            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::yellow);
-            //ui->warningCount->setText();
+            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::yellow);            
+            ui->warningCount->setText(QString::number(warningCount));
 
         }
         else {
-            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::green);
-            //ui->infoCount->setText();
+            for ( int j = 0; j < 5; j++) ui->tableWidget->item(0, j)->setBackground(Qt::green);            
+            ui->infoCount->setText(QString::number(infoCount));
+
 
         }
 
@@ -487,9 +446,6 @@ void MainWindow::viewData(QString data)
         ui->actionCopy->setEnabled(true);
 
     }
-
-    progressBar->reset();
-    progressBar->hide();
 
 }
 
@@ -543,27 +499,80 @@ void MainWindow::recordData()
 
 void MainWindow::exportData()
 {
-    progressBar->show();
-    progressBar->setMaximum(ui->tableWidget->rowCount());
+    ui->statusBar->showMessage(tr("Export Data.."));
 
     QString filename = QFileDialog::getSaveFileName(this, tr("Export to:"), "com-monitor.csv",
                                                     "CSV files (*.csv)", 0, 0);
     QFile file(filename);
     if(file.open(QFile::WriteOnly |QFile::Truncate)) {
-        QTextStream output(&file);
-        QStringList strList;
-        //strList <<"\" " +ui->tableWidget->horizontalHeaderItem(0)->data(Qt::DisplayRole).toString() +"\" ";
 
-        for( int r = 0; r < ui->tableWidget->rowCount(); ++r ) {
-            progressBar->setValue(r);
-
-            strList.clear();
-            for( int c = 0; c < ui->tableWidget->columnCount(); ++c ) {
-                strList << "\" "+ui->tableWidget->item( r, c )->text()+"\" ";
-            }
-            output << strList.join( ";" )+"\n";
+        QString dateFrom = ui->dateTimeFrom->date().toString("yyyy-MM-dd");
+        QString dateTo = ui->dateTimeTo->date().toString("yyyy-MM-dd");
+        QString level;
+        QString sensor;
+        int idxLevel = ui->logBoxExport->currentIndex();
+        switch(idxLevel) {
+            case 0: level = "";
+                    break;
+            case 1: level = "NOT IN (6,7,8,9)";
+                    break;
+            case 2: level = "IN (8,9)";
+                    break;
+            case 3: level = "IN (6,7)";
+                    break;
         }
+
+        if(ui->sensorCheckAllExport->isChecked()) {
+            //ui->sensorBoxExport->setCurrentIndex(ui->sensorBoxExport->findText("All"));
+            //sensor = ui->sensorBoxExport->itemData(ui->sensorBoxExport->currentIndex()).toString();
+            sensor = listSensor.join(",");
+        } else  {
+            //ui->sensorBoxExport->removeItem(ui->sensorBoxExport->findText("All"));
+            sensor = ui->sensorBoxExport->currentText();
+        }
+
+        //qDebug()<<"sensor = "<<sensor;
+
+        QSqlQuery query;
+        QString data = QString("SELECT * FROM tabMain "
+                               "WHERE status %4 "
+                               "AND date(datetime) between '%1' and '%2' "
+                               "AND sensor IN (%3) ").arg(dateFrom).arg(dateTo).arg(sensor).arg(level);
+
+        QSqlRecord recordCount;
+        query.prepare(QString("SELECT COUNT(*) FROM (%1) AS subquery").arg(data));
+        query.exec();
+        query.next();
+        recordCount = query.record();
+
+        int value = 0;
+        int qSize = query.value(0).toInt();
+
+        progressBar->show();
+        progressBar->setMaximum(qSize);
+
+        qDebug()<<"count = "<<qSize;
+
+        query.exec(data);
+        while(query.next()) {
+            QTextStream output(&file);
+            QStringList strList;
+            strList.clear();
+
+            for(int i=1; i<5; i++) strList.append(query.value(i).toString());
+            output << strList.join(";")+"\n";
+
+            progressBar->setValue(value++);
+
+            qDebug()<<"export = "<<strList;
+
+        }
+
         file.close();
+
+        //qDebug()<<query.lastError();
+        qDebug()<<query.lastQuery();
+
     }
 
     progressBar->reset();

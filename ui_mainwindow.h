@@ -16,6 +16,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateTimeEdit>
+#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -54,10 +55,10 @@ public:
     QTableWidget *tableWidget;
     QTabWidget *tabWidget;
     QWidget *viewTab;
-    QGridLayout *gridLayout_2;
+    QGridLayout *gridLayout;
     QLCDNumber *dateCurrent;
     QGroupBox *status;
-    QGridLayout *gridLayout;
+    QFormLayout *formLayout;
     QLabel *infoLabel;
     QLabel *infoCount;
     QLabel *warningLabel;
@@ -75,7 +76,6 @@ public:
     QCheckBox *sensorCheckAllSet;
     QLabel *sensorLabel_3;
     QComboBox *dataBoxSet;
-    QSpacerItem *horizontalSpacer_2;
     QPushButton *readButton;
     QSpacerItem *horizontalSpacer_3;
     QPushButton *writeButton;
@@ -215,10 +215,10 @@ public:
         tabWidget->setTabsClosable(false);
         viewTab = new QWidget();
         viewTab->setObjectName(QStringLiteral("viewTab"));
-        gridLayout_2 = new QGridLayout(viewTab);
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setContentsMargins(11, 11, 11, 11);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout = new QGridLayout(viewTab);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         dateCurrent = new QLCDNumber(viewTab);
         dateCurrent->setObjectName(QStringLiteral("dateCurrent"));
         dateCurrent->setMinimumSize(QSize(141, 0));
@@ -231,61 +231,72 @@ public:
         dateCurrent->setSegmentStyle(QLCDNumber::Filled);
         dateCurrent->setProperty("value", QVariant(0));
 
-        gridLayout_2->addWidget(dateCurrent, 0, 0, 1, 1);
+        gridLayout->addWidget(dateCurrent, 0, 0, 1, 1);
 
         status = new QGroupBox(viewTab);
         status->setObjectName(QStringLiteral("status"));
-        gridLayout = new QGridLayout(status);
-        gridLayout->setSpacing(6);
-        gridLayout->setContentsMargins(11, 11, 11, 11);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        formLayout = new QFormLayout(status);
+        formLayout->setSpacing(6);
+        formLayout->setContentsMargins(11, 11, 11, 11);
+        formLayout->setObjectName(QStringLiteral("formLayout"));
         infoLabel = new QLabel(status);
         infoLabel->setObjectName(QStringLiteral("infoLabel"));
         infoLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        gridLayout->addWidget(infoLabel, 0, 0, 1, 1);
+        formLayout->setWidget(0, QFormLayout::LabelRole, infoLabel);
 
         infoCount = new QLabel(status);
         infoCount->setObjectName(QStringLiteral("infoCount"));
+        QFont font;
+        font.setUnderline(true);
+        infoCount->setFont(font);
+        infoCount->setCursor(QCursor(Qt::PointingHandCursor));
+        infoCount->setTextFormat(Qt::AutoText);
 
-        gridLayout->addWidget(infoCount, 0, 1, 1, 1);
+        formLayout->setWidget(0, QFormLayout::FieldRole, infoCount);
 
         warningLabel = new QLabel(status);
         warningLabel->setObjectName(QStringLiteral("warningLabel"));
+        warningLabel->setScaledContents(false);
         warningLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        warningLabel->setOpenExternalLinks(false);
 
-        gridLayout->addWidget(warningLabel, 1, 0, 1, 1);
+        formLayout->setWidget(1, QFormLayout::LabelRole, warningLabel);
 
         warningCount = new QLabel(status);
         warningCount->setObjectName(QStringLiteral("warningCount"));
+        warningCount->setFont(font);
+        warningCount->setCursor(QCursor(Qt::PointingHandCursor));
 
-        gridLayout->addWidget(warningCount, 1, 1, 1, 1);
+        formLayout->setWidget(1, QFormLayout::FieldRole, warningCount);
 
         errorLabel = new QLabel(status);
         errorLabel->setObjectName(QStringLiteral("errorLabel"));
         errorLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        gridLayout->addWidget(errorLabel, 2, 0, 1, 1);
+        formLayout->setWidget(2, QFormLayout::LabelRole, errorLabel);
 
         errorCount = new QLabel(status);
         errorCount->setObjectName(QStringLiteral("errorCount"));
+        errorCount->setFont(font);
+        errorCount->setCursor(QCursor(Qt::PointingHandCursor));
 
-        gridLayout->addWidget(errorCount, 2, 1, 1, 1);
+        formLayout->setWidget(2, QFormLayout::FieldRole, errorCount);
 
 
-        gridLayout_2->addWidget(status, 0, 1, 2, 1);
+        gridLayout->addWidget(status, 0, 1, 2, 1);
 
         horizontalSpacer = new QSpacerItem(87, 68, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        gridLayout_2->addItem(horizontalSpacer, 0, 2, 2, 1);
+        gridLayout->addItem(horizontalSpacer, 0, 2, 2, 1);
 
         timeCurrent = new QLCDNumber(viewTab);
         timeCurrent->setObjectName(QStringLiteral("timeCurrent"));
         timeCurrent->setMinimumSize(QSize(141, 0));
-        QFont font;
-        font.setBold(false);
-        font.setWeight(50);
-        timeCurrent->setFont(font);
+        QFont font1;
+        font1.setBold(false);
+        font1.setWeight(50);
+        timeCurrent->setFont(font1);
         timeCurrent->setFrameShape(QFrame::NoFrame);
         timeCurrent->setFrameShadow(QFrame::Raised);
         timeCurrent->setLineWidth(1);
@@ -295,7 +306,7 @@ public:
         timeCurrent->setSegmentStyle(QLCDNumber::Flat);
         timeCurrent->setProperty("value", QVariant(0));
 
-        gridLayout_2->addWidget(timeCurrent, 1, 0, 1, 1);
+        gridLayout->addWidget(timeCurrent, 1, 0, 1, 1);
 
         tabWidget->addTab(viewTab, QString());
         controlTab = new QWidget();
@@ -340,10 +351,6 @@ public:
         dataBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
 
         gridLayout_3->addWidget(dataBoxSet, 1, 1, 1, 1);
-
-        horizontalSpacer_2 = new QSpacerItem(72, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout_3->addItem(horizontalSpacer_2, 1, 2, 1, 1);
 
 
         gridLayout_5->addWidget(control, 0, 0, 2, 1);

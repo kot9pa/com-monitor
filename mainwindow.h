@@ -98,6 +98,9 @@ private:
     QString settingsFile;
     QStringList listSensor;
     QSqlDatabase db;
+    int warningCount;
+    int errorCount;
+    int infoCount;
 
 };
 
