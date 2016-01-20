@@ -16,7 +16,6 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateTimeEdit>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -58,7 +57,7 @@ public:
     QGridLayout *gridLayout;
     QLCDNumber *dateCurrent;
     QGroupBox *status;
-    QFormLayout *formLayout;
+    QGridLayout *gridLayout_2;
     QLabel *infoLabel;
     QLabel *infoCount;
     QLabel *warningLabel;
@@ -77,7 +76,7 @@ public:
     QLabel *sensorLabel_3;
     QComboBox *dataBoxSet;
     QPushButton *readButton;
-    QSpacerItem *horizontalSpacer_3;
+    QSpacerItem *horizontalSpacer_2;
     QPushButton *writeButton;
     QWidget *exportTab;
     QGridLayout *gridLayout_4;
@@ -105,7 +104,7 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->setWindowModality(Qt::NonModal);
-        MainWindow->resize(525, 548);
+        MainWindow->resize(627, 603);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -212,7 +211,9 @@ public:
         tabWidget->setSizePolicy(sizePolicy);
         tabWidget->setMinimumSize(QSize(525, 127));
         tabWidget->setMaximumSize(QSize(16777215, 129));
+        tabWidget->setDocumentMode(false);
         tabWidget->setTabsClosable(false);
+        tabWidget->setTabBarAutoHide(false);
         viewTab = new QWidget();
         viewTab->setObjectName(QStringLiteral("viewTab"));
         gridLayout = new QGridLayout(viewTab);
@@ -235,15 +236,19 @@ public:
 
         status = new QGroupBox(viewTab);
         status->setObjectName(QStringLiteral("status"));
-        formLayout = new QFormLayout(status);
-        formLayout->setSpacing(6);
-        formLayout->setContentsMargins(11, 11, 11, 11);
-        formLayout->setObjectName(QStringLiteral("formLayout"));
+        gridLayout_2 = new QGridLayout(status);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setHorizontalSpacing(10);
+        gridLayout_2->setVerticalSpacing(0);
+        gridLayout_2->setContentsMargins(10, 0, 10, 0);
         infoLabel = new QLabel(status);
         infoLabel->setObjectName(QStringLiteral("infoLabel"));
+        infoLabel->setScaledContents(false);
         infoLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        formLayout->setWidget(0, QFormLayout::LabelRole, infoLabel);
+        gridLayout_2->addWidget(infoLabel, 0, 0, 1, 1);
 
         infoCount = new QLabel(status);
         infoCount->setObjectName(QStringLiteral("infoCount"));
@@ -253,7 +258,7 @@ public:
         infoCount->setCursor(QCursor(Qt::PointingHandCursor));
         infoCount->setTextFormat(Qt::AutoText);
 
-        formLayout->setWidget(0, QFormLayout::FieldRole, infoCount);
+        gridLayout_2->addWidget(infoCount, 0, 1, 1, 1);
 
         warningLabel = new QLabel(status);
         warningLabel->setObjectName(QStringLiteral("warningLabel"));
@@ -261,27 +266,27 @@ public:
         warningLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         warningLabel->setOpenExternalLinks(false);
 
-        formLayout->setWidget(1, QFormLayout::LabelRole, warningLabel);
+        gridLayout_2->addWidget(warningLabel, 1, 0, 1, 1);
 
         warningCount = new QLabel(status);
         warningCount->setObjectName(QStringLiteral("warningCount"));
         warningCount->setFont(font);
         warningCount->setCursor(QCursor(Qt::PointingHandCursor));
 
-        formLayout->setWidget(1, QFormLayout::FieldRole, warningCount);
+        gridLayout_2->addWidget(warningCount, 1, 1, 1, 1);
 
         errorLabel = new QLabel(status);
         errorLabel->setObjectName(QStringLiteral("errorLabel"));
         errorLabel->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        formLayout->setWidget(2, QFormLayout::LabelRole, errorLabel);
+        gridLayout_2->addWidget(errorLabel, 2, 0, 1, 1);
 
         errorCount = new QLabel(status);
         errorCount->setObjectName(QStringLiteral("errorCount"));
         errorCount->setFont(font);
         errorCount->setCursor(QCursor(Qt::PointingHandCursor));
 
-        formLayout->setWidget(2, QFormLayout::FieldRole, errorCount);
+        gridLayout_2->addWidget(errorCount, 2, 1, 1, 1);
 
 
         gridLayout->addWidget(status, 0, 1, 2, 1);
@@ -318,9 +323,10 @@ public:
         control = new QGroupBox(controlTab);
         control->setObjectName(QStringLiteral("control"));
         gridLayout_3 = new QGridLayout(control);
-        gridLayout_3->setSpacing(6);
+        gridLayout_3->setSpacing(10);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setContentsMargins(10, 10, 10, 10);
         sensorLabel_2 = new QLabel(control);
         sensorLabel_2->setObjectName(QStringLiteral("sensorLabel_2"));
         sensorLabel_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -330,7 +336,8 @@ public:
         sensorBoxSet = new QComboBox(control);
         sensorBoxSet->setObjectName(QStringLiteral("sensorBoxSet"));
         sensorBoxSet->setEnabled(true);
-        sensorBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+        sensorBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+        sensorBoxSet->setMinimumContentsLength(5);
 
         gridLayout_3->addWidget(sensorBoxSet, 0, 1, 1, 1);
 
@@ -348,7 +355,8 @@ public:
         dataBoxSet = new QComboBox(control);
         dataBoxSet->setObjectName(QStringLiteral("dataBoxSet"));
         dataBoxSet->setEnabled(true);
-        dataBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
+        dataBoxSet->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+        dataBoxSet->setMinimumContentsLength(5);
 
         gridLayout_3->addWidget(dataBoxSet, 1, 1, 1, 1);
 
@@ -360,9 +368,9 @@ public:
 
         gridLayout_5->addWidget(readButton, 0, 1, 1, 1);
 
-        horizontalSpacer_3 = new QSpacerItem(198, 68, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(173, 58, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        gridLayout_5->addItem(horizontalSpacer_3, 0, 2, 2, 1);
+        gridLayout_5->addItem(horizontalSpacer_2, 0, 2, 2, 1);
 
         writeButton = new QPushButton(controlTab);
         writeButton->setObjectName(QStringLiteral("writeButton"));
@@ -445,7 +453,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 525, 21));
+        menuBar->setGeometry(QRect(0, 0, 627, 31));
         menuCalls = new QMenu(menuBar);
         menuCalls->setObjectName(QStringLiteral("menuCalls"));
         menuTools = new QMenu(menuBar);
@@ -556,8 +564,8 @@ public:
         errorCount->setText(QApplication::translate("MainWindow", "Status", 0));
         tabWidget->setTabText(tabWidget->indexOf(viewTab), QApplication::translate("MainWindow", "Monitor", 0));
         control->setTitle(QString());
-        sensorLabel_2->setText(QApplication::translate("MainWindow", "Sensor:", 0));
-        sensorCheckAllSet->setText(QApplication::translate("MainWindow", "All Sensors", 0));
+        sensorLabel_2->setText(QApplication::translate("MainWindow", "Address:", 0));
+        sensorCheckAllSet->setText(QApplication::translate("MainWindow", "All Address", 0));
         sensorLabel_3->setText(QApplication::translate("MainWindow", "Data:", 0));
         readButton->setText(QApplication::translate("MainWindow", "Read", 0));
         writeButton->setText(QApplication::translate("MainWindow", "Write", 0));

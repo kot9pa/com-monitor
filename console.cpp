@@ -62,7 +62,7 @@ Console::~Console()
 }
 
 void Console::putData(QByteArray data)
-{
+{    
     insertPlainText(QString(data));
 
     QScrollBar *bar = verticalScrollBar();
@@ -87,7 +87,7 @@ void Console::keyPressEvent(QKeyEvent *e)
         text = textCursor().block().text().toLocal8Bit();        
         moveCursor(QTextCursor::Start);
         qDebug()<<"text1 = "<<text;
-        emit getData(text+"\r");
+        emit getData(text);
         clear();
 
     case Qt::Key_Backspace:

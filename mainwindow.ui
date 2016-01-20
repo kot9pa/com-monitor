@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
-    <height>548</height>
+    <width>627</width>
+    <height>603</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -160,7 +160,13 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
       <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="tabBarAutoHide">
        <bool>false</bool>
       </property>
       <widget class="QWidget" name="viewTab">
@@ -207,11 +213,32 @@
           <property name="title">
            <string>Status</string>
           </property>
-          <layout class="QFormLayout" name="formLayout">
+          <layout class="QGridLayout" name="gridLayout_2">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <property name="horizontalSpacing">
+            <number>10</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>0</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="infoLabel">
              <property name="text">
               <string>Info:</string>
+             </property>
+             <property name="scaledContents">
+              <bool>false</bool>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -361,10 +388,25 @@
            <string/>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <property name="spacing">
+            <number>10</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="sensorLabel_2">
              <property name="text">
-              <string>Sensor:</string>
+              <string>Address:</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -377,14 +419,17 @@
               <bool>true</bool>
              </property>
              <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+              <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+             </property>
+             <property name="minimumContentsLength">
+              <number>5</number>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
             <widget class="QCheckBox" name="sensorCheckAllSet">
              <property name="text">
-              <string>All Sensors</string>
+              <string>All Address</string>
              </property>
             </widget>
            </item>
@@ -404,7 +449,10 @@
               <bool>true</bool>
              </property>
              <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+              <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+             </property>
+             <property name="minimumContentsLength">
+              <number>5</number>
              </property>
             </widget>
            </item>
@@ -419,14 +467,14 @@
          </widget>
         </item>
         <item row="0" column="2" rowspan="2">
-         <spacer name="horizontalSpacer_3">
+         <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>198</width>
-            <height>68</height>
+            <width>173</width>
+            <height>58</height>
            </size>
           </property>
          </spacer>
@@ -557,8 +605,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>525</width>
-     <height>21</height>
+     <width>627</width>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuCalls">

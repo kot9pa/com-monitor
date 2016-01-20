@@ -59,29 +59,35 @@ signals:
 private slots:
     void openSerialPort();
     void closeSerialPort();
+    void buttonRRequest();
+    void buttonWRequest();
     void customMenuRequest(const QPoint &pos);
     void initTimer();
     void currentDateTime();
-    void writeData(const QByteArray &data);
-    void fillDataInfo();
+    void writeData(const QByteArray &data);    
     void readData();
-    void clearData();
-    void viewData(QString data);
-    void recordData();
+    void verifyData();
     void refreshData();
     void processData();
+    void fillDataInfo();
+    void viewData(QString data);
+    void recordData();    
     void exportData();
+    void clearData();
     void copyData();
     void handleError(QSerialPort::SerialPortError error);
     void about();
 
-private:    
+private:
     void initActionsConnections();
     void initSerialPort();
     void initTable();
     void fillSensorInfo();
     void loadSettings();
     void saveSettings();
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -91,12 +97,21 @@ private:
     Console *console;
     QMenu *menu;
     QTimer *refresh;
+    QTimer *pause;
     QTimer *timer;
     QByteArray bytes;
-    QByteArray msg;
+    QByteArray msgLast;
+    QByteArray msgQueue;
+    QByteArray msgRequest;
+    QByteArray msgRead;
+    QByteArray msgReadAll;
+    QByteArray msgWrite;
+    QByteArray msgWriteAll;
     QString format;
+    QString address;
     QString settingsFile;
     QStringList listSensor;
+    QStringList listAddress;
     QSqlDatabase db;
     int warningCount;
     int errorCount;

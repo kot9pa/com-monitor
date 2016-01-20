@@ -70,8 +70,8 @@ public:
     {
         if (SettingsDialog->objectName().isEmpty())
             SettingsDialog->setObjectName(QStringLiteral("SettingsDialog"));
-        SettingsDialog->resize(381, 318);
-        SettingsDialog->setMinimumSize(QSize(381, 318));
+        SettingsDialog->resize(485, 427);
+        SettingsDialog->setMinimumSize(QSize(485, 427));
         SettingsDialog->setMaximumSize(QSize(1000000, 100000));
         gridLayout_3 = new QGridLayout(SettingsDialog);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
