@@ -8,3 +8,4 @@ install
 *.log
 *.sqlite
 *.csv
+*.db

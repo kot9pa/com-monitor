@@ -33,6 +33,7 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSql>
 #include <QProgressBar>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 
@@ -43,6 +44,7 @@ class MainWindow;
 QT_END_NAMESPACE
 
 class Console;
+class Dialog;
 class SettingsDialog;
 
 class MainWindow : public QMainWindow
@@ -55,11 +57,12 @@ public:
 
 signals:
     void writeRequest(const QByteArray &data);
+    void sendData(QString data);
 
 private slots:
     void openSerialPort();
     void closeSerialPort();
-    void customMenuRequest(const QPoint &pos);
+    void customMenuRequest(const QPoint &pos);    
     void initTimer();
     void currentDateTime();
     void writeData(const QByteArray &data);
@@ -83,14 +86,19 @@ private:
     void loadSettings();
     void saveSettings();
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
     Ui::MainWindow *ui;
     QProgressBar *progressBar;
     SettingsDialog *settings;
+    Dialog *status;
     QSerialPort *serial;
-    Console *console;
+    Console *console;    
     QMenu *menu;
     QTimer *refresh;
+    QTimer *pause;
     QTimer *timer;
     QByteArray bytes;
     QByteArray msg;
